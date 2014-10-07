@@ -1,0 +1,46 @@
+.context-menu-list {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	display: inline-block;
+	float: left;
+	min-width: 160px;
+	padding: 5px 0;
+	margin: 2px 0 0;
+	list-style: none;
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+	background-clip: padding-box;
+}
+ 
+.context-menu-item {
+	display: block;
+	padding: 3px 20px;
+	clear: both;
+	font-weight: normal;
+	line-height: 1.428571429;
+	color: #333333;
+	white-space: nowrap;
+}
+ 
+.context-menu-separator {
+	font-size: 0;
+	height: 1px;
+	margin: 3px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+    padding:0;
+}
+/**
+.context-menu-item.hover {
+	cursor: pointer;
+	color: #ffffff;
+	text-decoration: none;
+	background-color: #428bca;
+}
+/**/

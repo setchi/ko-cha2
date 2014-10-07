@@ -1,0 +1,25 @@
+.ownership_room_list .glyphicon-remove {
+	color: #555;
+	height: 40px;
+	padding: 10px;
+	margin-top: -10px;
+}
+
+.ownership_room_list .glyphicon-remove:hover {
+	color: #000;
+	font-weight: bold;
+}
+
+.index-header {
+	/*background-color: #f5f5f5;*/
+}
+
+.index-header .caption {
+	padding: 40px 20px 20px 20px;
+}
+
+.carousel-caption {
+	color: #555;
+	text-shadow:none;
+	font-weight: bold;
+}

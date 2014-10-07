@@ -1,0 +1,26 @@
+
+.container {
+	max-width: 837px;
+}
+.container {
+	max-width: 960px;
+}
+
+.ninja_onebutton {
+	height: 50px;
+	padding: 15px 0px;
+	padding-left: 10px;
+}
+
+.modal textarea {
+	width: 100%;
+	height: 110px;
+}
+
+.modal-body {
+	padding: 15px;
+}
+
+.modal-footer {
+	margin-top: 0px;
+}
