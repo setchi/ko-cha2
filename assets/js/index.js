@@ -3,7 +3,7 @@
  */
 
 $(function () {
-	var $modal = null, baseUrl = 'http://setchi.jp/ko-cha2/';
+	var $modal = null, pathName = location.pathname;
 
 	$('[data-toggle="modal"]').mousedown(function () {
 		$modal = $($(this).data('target'));
@@ -34,10 +34,10 @@ $(function () {
 				sendData['password'] = password;
 			}
 
-			$.get(baseUrl + 'room/create.json', sendData, function ($modal) {
+			$.get(pathName + 'room/create.json', sendData, function ($modal) {
 				return function (msg) {
 					sending = false;
-					var url = baseUrl + msg['id'];
+					var url = location.protocol + '//' + location.host + pathName + msg['id'];
 					var roomLink = "<p>部屋が作成されました。下記のURLを共有して開始してください。</p><a href=" + url + " target=\"_blank\">" + url + "</a>";
 
 					$modal.find('.panel1').hide();
@@ -67,7 +67,7 @@ $(function () {
 			if (e['ownership'].length !== 0) {
 				var link = '';
 				for (var i in e['ownership']) {
-					var id = e['ownership'][i]['id'], roomUrl = baseUrl + id;
+					var id = e['ownership'][i]['id'], roomUrl = pathName + id;
 					link = '<a class="list-group-item" href="' + roomUrl + '" data-room-id="' + id + '">ID： ' + id + '<span class="pull-right glyphicon glyphicon-remove" data-room-id="' + id +'">クローズ</span></a>' + link;
 				}
 				$ownershipRoomList.prepend(link);

@@ -3,7 +3,7 @@
  */
 
 $(function () {
-	var $modal = null, baseUrl = 'http://setchi.jp/ko-cha2/';
+	var $modal = null, pathName = location.pathname;
 
 	$('[data-toggle="modal"]').mousedown(function () {
 		$modal = $($(this).data('target'));
@@ -21,7 +21,7 @@ $(function () {
 			if (message && !sending) {
 				sending = true;
 
-				$.post(baseUrl + 'email/send.json', {
+				$.post(pathName + 'email/send.json', {
 					'body': message
 
 				}, function ($modal) {
