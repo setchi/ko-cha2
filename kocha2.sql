@@ -1,12 +1,11 @@
-
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+-- --------------------------------------------------------
 
 --
 -- テーブルの構造 `chat_log`
@@ -16,7 +15,7 @@ DROP TABLE IF EXISTS `chat_log`;
 CREATE TABLE IF NOT EXISTS `chat_log` (
   `room_id` varchar(15) collate utf8_unicode_ci default NULL,
   `viewer_id` varchar(300) collate utf8_unicode_ci default NULL,
-  `message` varchar(300) collate utf8_unicode_ci default NULL,
+  `message` text collate utf8_unicode_ci,
   `id` int(11) default NULL,
   `time` double default NULL,
   `date` datetime default '0000-00-00 00:00:00',
@@ -118,6 +117,35 @@ CREATE TABLE IF NOT EXISTS `viewer` (
   KEY `room_id` (`room_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- ビュー用の代替構造 `v_chat_log`
+--
+DROP VIEW IF EXISTS `v_chat_log`;
+CREATE TABLE IF NOT EXISTS `v_chat_log` (
+`room_id` varchar(15)
+,`viewer_id` varchar(300)
+,`name` varchar(50)
+,`image` varchar(300)
+,`message` text
+,`id` int(11)
+,`time` double
+);
+-- --------------------------------------------------------
+
+--
+-- ビュー用の代替構造 `v_viewer`
+--
+DROP VIEW IF EXISTS `v_viewer`;
+CREATE TABLE IF NOT EXISTS `v_viewer` (
+`room_id` varchar(15)
+,`viewer_id` varchar(300)
+,`name` varchar(50)
+,`image` varchar(300)
+,`num` int(11)
+,`time` double
+,`viewing` int(11)
+,`date` datetime
+);
 -- --------------------------------------------------------
 
 --
@@ -125,9 +153,7 @@ CREATE TABLE IF NOT EXISTS `viewer` (
 --
 DROP TABLE IF EXISTS `v_chat_log`;
 
-CREATE VIEW `v_chat_log` AS
-select `viewer`.`room_id` AS `room_id`,`viewer`.`viewer_id` AS `viewer_id`,`viewer`.`name` AS `name`,`viewer`.`image` AS `image`,`chat_log`.`message` AS `message`,`chat_log`.`id` AS `id`,`chat_log`.`time` AS `time`
-from (`chat_log` join `viewer` on(((`chat_log`.`room_id` = `viewer`.`room_id`) and (`chat_log`.`viewer_id` = `viewer`.`viewer_id`)))) order by `chat_log`.`id` desc;
+CREATE VIEW `v_chat_log` AS select `viewer`.`room_id` AS `room_id`,`viewer`.`viewer_id` AS `viewer_id`,`viewer`.`name` AS `name`,`viewer`.`image` AS `image`,`chat_log`.`message` AS `message`,`chat_log`.`id` AS `id`,`chat_log`.`time` AS `time` from (`chat_log` join `viewer` on(((`chat_log`.`room_id` = `viewer`.`room_id`) and (`chat_log`.`viewer_id` = `viewer`.`viewer_id`)))) order by `chat_log`.`id` desc;
 
 -- --------------------------------------------------------
 
@@ -136,6 +162,4 @@ from (`chat_log` join `viewer` on(((`chat_log`.`room_id` = `viewer`.`room_id`) a
 --
 DROP TABLE IF EXISTS `v_viewer`;
 
-CREATE VIEW `v_viewer` AS
-select `viewer`.`room_id` AS `room_id`,`viewer`.`viewer_id` AS `viewer_id`,`viewer`.`name` AS `name`,`viewer`.`image` AS `image`,`viewer`.`num` AS `num`,`viewer`.`time` AS `time`,`viewer`.`viewing` AS `viewing`,`viewer`.`date` AS `date`
-from `viewer` where (`viewer`.`viewing` = 1);
+CREATE VIEW `v_viewer` AS select `viewer`.`room_id` AS `room_id`,`viewer`.`viewer_id` AS `viewer_id`,`viewer`.`name` AS `name`,`viewer`.`image` AS `image`,`viewer`.`num` AS `num`,`viewer`.`time` AS `time`,`viewer`.`viewing` AS `viewing`,`viewer`.`date` AS `date` from `viewer` where (`viewer`.`viewing` = 1);
