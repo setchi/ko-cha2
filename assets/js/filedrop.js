@@ -101,7 +101,7 @@ function readFile(file) {
 
 		// エディタに情報を反映、ファイルの更新監視開始
 		targetTab.setMoniteringFile(file, getTextFromArrayBuffer).applyData({
-			text: text,
+			text: encodeURIComponent(text),
 			mode: getModeByExt(ext)
 		});
 
