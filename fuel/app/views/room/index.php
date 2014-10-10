@@ -128,7 +128,7 @@
 	echo Asset::js('lib/notify.js');
 	echo Asset::js('common.js');
 	echo Asset::js('utils.js');
-	echo Asset::js('server.js');
+	echo Asset::js('connection.js');
 	echo Asset::js('editor.js');
 	echo Asset::js('ui.js');
 	echo Asset::js('viewer.js');
@@ -144,7 +144,7 @@
 	Casset::js('common.js');
 	Casset::js('utils.js');
 	Casset::js('editor.js');
-	Casset::js('server.js');
+	Casset::js('connection.js');
 	Casset::js('ui.js');
 	Casset::js('viewer.js');
 	Casset::js('filedrop.js');
