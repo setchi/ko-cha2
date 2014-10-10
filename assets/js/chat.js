@@ -32,7 +32,7 @@ var Chat = {
 
 			// TODO: WebRTCのpeerID交換にチャットの機能を借りているので専用APIを作る。
 			} else if (data.message.match('\\[sendOffer\\](.*)\\[/sendOffer\\]')) {
-				server.onOffer(data.message.match('\\[sendOffer\\](.*)\\[/sendOffer\\]')[1]);
+				connection.onOffer(data.message.match('\\[sendOffer\\](.*)\\[/sendOffer\\]')[1]);
 				continue;
 
 			} else {
@@ -110,7 +110,7 @@ function sendChat(message) {
 	Chat.insert([data], true);
 
 	//*
-	server.sendRTC({
+	connection.sendRTC({
 		updated: true,
 		chat_log: [{
 			viewer_id: getMyViewerId(),
@@ -120,7 +120,7 @@ function sendChat(message) {
 	});
 
 	/*/
-	server.send({
+	connection.send({
 		type: 'chat_log',
 		data: message
 	});

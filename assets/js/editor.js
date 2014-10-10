@@ -330,7 +330,7 @@ Editor.prototype = {
 		}
 		
 		if (this.isSelf) {
-			server.send({
+			connection.send({
 				type: 'editor_change_state',
 				data: JSON.stringify({
 					viewerId: this.viewerId,
@@ -497,7 +497,7 @@ Tab.prototype = {
 			};
 
 			if (toServer) {
-				server.send(editorData);
+				connection.send(editorData);
 				return;
 			}
 
@@ -508,7 +508,7 @@ Tab.prototype = {
 				data: [editorData]
 			};
 
-			server.sendRTC(sendData);
+			connection.sendRTC(sendData);
 		}
 
 		var timer = null;

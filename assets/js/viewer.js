@@ -76,7 +76,7 @@ var viewer = new Viewer(editorList);
 
 // ページを離れたとき
 window.onbeforeunload = function () {
-	server.disconnect();
+	connection.disconnect();
 }
 
 // SNSアイコンインポート
@@ -86,7 +86,7 @@ $('.sns-login').find('span').click(function () {
 	window.open(url, '', 'width=800,height=500');
 });
 function snsApply(image, name) {
-	server.send({
+	connection.send({
 		type: 'update_image',
 		data: {
 			'image': image,

@@ -4,11 +4,11 @@ var roomInfo = JSON.parse($('#js_room_info').text());
  * 通信制御
  */
 
-var Server = function () {
+var Connection = function () {
 	this.watch(-1, -1);
 	this.connectionList = {};
 };
-Server.prototype = {
+Connection.prototype = {
 	init: function (viewerInfo) {
 		roomInfo.viewer = viewerInfo;
 		localSession.add(roomInfo.room.id, viewerInfo.viewer_id);
@@ -171,4 +171,4 @@ Server.prototype = {
 		});
 	}
 }
-var server = new Server();
+var connection = new Connection();
