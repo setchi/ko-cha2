@@ -143,7 +143,9 @@
 	Casset::js('lib/notify.js');
 	Casset::js('common.js');
 	Casset::js('utils.js');
+	Casset::js('editor-tab.js');
 	Casset::js('editor.js');
+	Casset::js('editor-list.js');
 	Casset::js('connection.js');
 	Casset::js('ui.js');
 	Casset::js('viewer.js');

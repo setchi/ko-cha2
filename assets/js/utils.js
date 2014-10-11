@@ -37,3 +37,7 @@ function executeIfNotViewing(callback) {
 		if (!rendered) callback();
 	}, 600);
 }
+
+function getMyViewerId() {
+	return roomInfo.viewer.viewer_id || localSession.get(roomInfo.room.id);
+}
