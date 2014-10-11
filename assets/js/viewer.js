@@ -50,7 +50,7 @@ Viewer.prototype = {
 
 	getImageUrl: function (data) {
 		data = "" + data;
-		return data.length < 10 ? '/ko-cha2/assets/img/user/default/' + data + '.png' : data;
+		return data.length < 10 ? 'assets/img/user/default/' + data + '.png' : data;
 	},
 	
 	changeIcon: (function () {
@@ -82,7 +82,7 @@ window.onbeforeunload = function () {
 // SNSアイコンインポート
 $('.sns-login').find('span').click(function () {
 	var sns = $(this).data('sns');
-	var url = '/ko-cha2/auth/login/' + sns;
+	var url = 'auth/login/' + sns;
 	window.open(url, '', 'width=800,height=500');
 });
 function snsApply(image, name) {
