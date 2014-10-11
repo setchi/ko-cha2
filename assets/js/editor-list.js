@@ -67,12 +67,12 @@ EditorList.prototype = {
 
 	// 表示エディタを切り替える
 	changeViewingEditor: function (viewerId) {
-		for (var id in this.editorList) {
-			this.editorList[id].hide();
-		}
 		if (void 0 === this.editorList[viewerId]) {
 			console.warn("ユーザー '" + viewerId + "' が存在しません");
 			return;
+		}
+		for (var id in this.editorList) {
+			this.editorList[id].hide();
 		}
 		this.editorList[viewerId].show();
 	},
