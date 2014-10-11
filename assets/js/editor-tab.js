@@ -7,30 +7,14 @@ var Tab = function (viewerId, tabName) {
 	this.viewerId = viewerId;
 	this.tabName = tabName;
 	this.isSelf = viewerId === getMyViewerId();
-	var _self = this;
-
-	var $root = $(document.getElementById(viewerId));
-	var editorRegion = $(document.getElementById('editor-region'));
-	var tabItemText = '<li class="tab-item" data-tab-name="%s"><a class="label" title="">%s</a><a class="close" data-tab-name="%s">x</a></li>';
-	var editorText = '<div id="%s" data-tab-name="%s"></div>';
-	// data属性がうまく反映されず、テンプレート化いったん断念
-	$(sprintf(editorText, this.editorId, tabName)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
-	$(sprintf(tabItemText, tabName, tabName, tabName)).appendTo($root.find('.tab-list'));
 	
+	this._createTabElement(viewerId, tabName);
 	this.$editor = $(document.getElementById(this.editorId));
 	this.editor = ace.edit(this.editorId);
-	this.editor.session.setUseSoftTabs(true);
-	this.editor.setAnimatedScroll(true);
-	this.setTheme('cobalt');
-	this.setMode('c_cpp');
-	this.editor.setFontSize(12);
 	this.fileMoniterTick = null;
 	this.fileLastMod = -1;
 
-	if (this.viewerId !== roomInfo.viewer.viewer_id) {
-		this.editor.setReadOnly(true);
-	}
-
+	var _self = this;
 	// 受信データ反映時の関数マッピング
 	this.update = {
 		range: function (_self, range) {
@@ -59,13 +43,34 @@ var Tab = function (viewerId, tabName) {
 		}
 	}
 
-	var init = false;
-	if (this.isSelf) {
-		this.init();
-	}
+	this._init();
 }
 Tab.prototype = {
-	init: function () {
+	_createTabElement: function (viewerId, tabName) {
+		var $root = $(document.getElementById(viewerId));
+		var editorRegion = $(document.getElementById('editor-region'));
+		var tabItemText = '<li class="tab-item" data-tab-name="%s"><a class="label" title="">%s</a><a class="close" data-tab-name="%s">x</a></li>';
+		var editorText = '<div id="%s" data-tab-name="%s"></div>';
+		// data属性がうまく反映されず、テンプレート化いったん断念
+		$(sprintf(editorText, this.editorId, tabName)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
+		$(sprintf(tabItemText, tabName, tabName, tabName)).appendTo($root.find('.tab-list'));
+	},
+
+	_init: function () {		
+		this.editor.session.setUseSoftTabs(true);
+		this.editor.setAnimatedScroll(true);
+		this.setTheme('cobalt');
+		this.setMode('c_cpp');
+		this.editor.setFontSize(12);
+
+		if (this.isSelf) {
+			this._initSelf();
+		} else {
+			this.editor.setReadOnly(true);
+		}
+	},
+
+	_initSelf: function () {
 		var _self = this;
 		this.sendData = function (type, data, toServer) {
 			var editorData = {
