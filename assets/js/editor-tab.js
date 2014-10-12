@@ -8,7 +8,7 @@ var Tab = function (viewerId, tabName) {
 	this.tabName = tabName;
 	this.isSelf = viewerId === getMyViewerId();
 	
-	this._createTabElement(viewerId, tabName);
+	this._initTabElement(viewerId, tabName);
 	this.$editor = $(document.getElementById(this.editorId));
 	this.editor = ace.edit(this.editorId);
 	this.fileMoniterTick = null;
@@ -46,7 +46,7 @@ var Tab = function (viewerId, tabName) {
 	this._init();
 }
 Tab.prototype = {
-	_createTabElement: function (viewerId, tabName) {
+	_initTabElement: function (viewerId, tabName) {
 		var $root = $(document.getElementById(viewerId));
 		var editorRegion = $(document.getElementById('editor-region'));
 		var tabItemText = '<li class="tab-item" data-tab-name="%s"><a class="label" title="">%s</a><a class="close" data-tab-name="%s">x</a></li>';

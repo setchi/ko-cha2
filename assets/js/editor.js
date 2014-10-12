@@ -8,7 +8,6 @@ var Editor = function (viewerId, state) {
 	this.tabList = [];
 	this.currentTabName;
 	this.$root = $(document.getElementById(this.viewerId));
-
 	this.viewing = false;
 	this.state = state;
 	this.setPosition(state);
@@ -18,9 +17,14 @@ var Editor = function (viewerId, state) {
 	this.$editorRegion = $(document.getElementById('editor-region'));
 	this.isSelf = viewerId === getMyViewerId();
 
-	var _self = this;
-	// 自身のエディタのトップバーをダブルクリックで空タブを生成する
 	if (this.isSelf) {
+		this._initSelfEditor();
+	}
+}
+Editor.prototype = {
+	_initSelfEditor: function () {
+		var _self = this;
+		// 自身のエディタのトップバーをダブルクリックで空タブを生成する
 		this.$editorRegion.find('.editor-top-bar').mousedown(function () {
 			var timer = -1;
 			return function (e) {
@@ -51,9 +55,8 @@ var Editor = function (viewerId, state) {
 				return cancelEvent(e);
 			}
 		});
-	}
-}
-Editor.prototype = {
+	},
+
 	getSizeRate: function (state) {
 		var rates = { top: 0, left: 0, width: 0, height: 0 };
 		switch (state) {
