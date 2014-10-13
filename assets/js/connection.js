@@ -9,12 +9,26 @@ var Connection = function () {
 	this.connectionList = {};
 };
 Connection.prototype = {
+	_disconnect: function () {
+		this.myPeer.destroy();
+		this.send({
+			type: 'exit_viewer',
+			data: roomInfo.viewer.viewer_id
+		}, true);
+	},
+
 	_init: function (viewerInfo) {
 		roomInfo.viewer = viewerInfo;
 		localSession.add(roomInfo.room.id, viewerInfo.viewer_id);
 		this._initPeer();
 		viewer.init();
 		editorList.init();
+
+		// ページを離れるとき
+		var _self = this;
+		window.onbeforeunload = function () {
+			_self._disconnect();
+		}
 	},
 
 	// peerの初期化処理
@@ -106,15 +120,6 @@ Connection.prototype = {
 		for (var viewerId in this.connectionList) {
 			this.connectionList[viewerId].send(data);
 		}
-	},
-
-	// 接続切断処理。　onbeforeunload で呼び出される
-	disconnect: function () {
-		this.myPeer.destroy();
-		this.send({
-			type: 'exit_viewer',
-			data: roomInfo.viewer.viewer_id
-		}, true);
 	},
 
 	// long pollingにpush

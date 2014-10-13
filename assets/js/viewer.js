@@ -29,7 +29,7 @@ Viewer.prototype = {
 				this.add(data[i]);
 			}
 
-			if (data[i].peer_id) {
+			if (data[i].viewer_id !== getMyViewerId() && data[i].peer_id) {
 				connection.onOffer(data[i].peer_id);
 			}
 		}
@@ -76,12 +76,6 @@ Viewer.prototype = {
 }
 
 var viewer = new Viewer(editorList);
-
-
-// ページを離れたとき
-window.onbeforeunload = function () {
-	connection.disconnect();
-}
 
 // SNSアイコンインポート
 $('.sns-login').find('span').click(function () {
