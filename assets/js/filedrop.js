@@ -120,7 +120,7 @@ function readFile (file) {
 		var text = arrayBufferToString(e.target.result);
 
 		// エディタに情報を反映、ファイルの更新監視開始
-		targetTab.setMoniteringFile(file, arrayBufferToString).applyData({
+		targetTab.startMonitoringFile(file, arrayBufferToString).applyData({
 			text: encodeURIComponent(text),
 			mode: getModeByExt(ext)
 		});

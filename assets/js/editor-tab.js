@@ -261,13 +261,13 @@ Tab.prototype = {
 		this.send(textData, true);
 	},
 
-	
+
 	/**
 	 * ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
 	 * @param {File} file
 	 * @param {Function} arrayBufferToString - ArrayBufferの内容を文字列に変換する関数
 	 */
-	setMoniteringFile: function (file, arrayBufferToString) {
+	startMonitoringFile: function (file, arrayBufferToString) {
 		var _self = this;
 		this.fileLastMod = file.lastModifiedDate;
 
