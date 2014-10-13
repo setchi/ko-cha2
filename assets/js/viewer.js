@@ -29,7 +29,8 @@ Viewer.prototype = {
 				this.add(data[i]);
 			}
 
-			if (data[i].viewer_id !== getMyViewerId() && data[i].peer_id) {
+			// PeerConnectionのオファーが来た
+			if (data[i].peer_id &&　data[i].viewing == '1' && data[i].viewer_id !== getMyViewerId()) {
 				connection.onOffer(data[i].peer_id);
 			}
 		}
