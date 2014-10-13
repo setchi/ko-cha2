@@ -60,6 +60,7 @@ class Model_Chat extends Model
 			break;
 
 		case 'update_image':
+		case 'update_peer_id':
 			Model_Viewer::update_viewer($room_id, $viewer_id, $data);
 			$viewer_id = 'all';
 			$type = 'update_viewer';

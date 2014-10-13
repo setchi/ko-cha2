@@ -114,9 +114,11 @@ class Controller_Chat extends Controller_Rest
 		}
 
 		if ($last_chat_id == -1 && $last_time == -1) {
+			$viewer = Model_Viewer::enter_viewer($room_id, $viewer_id);
+			Model_Viewer::update_viewer($room_id, $viewer_id, array('peer_id' => null));
 			return $this->response(array(
 				'updated' => false,
-				'viewer' => Model_Viewer::enter_viewer($room_id, $viewer_id)
+				'viewer' => $viewer
 			));
 		}
 

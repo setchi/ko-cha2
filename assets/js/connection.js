@@ -9,16 +9,16 @@ var Connection = function () {
 	this.connectionList = {};
 };
 Connection.prototype = {
-	init: function (viewerInfo) {
+	_init: function (viewerInfo) {
 		roomInfo.viewer = viewerInfo;
 		localSession.add(roomInfo.room.id, viewerInfo.viewer_id);
-		this.initPeer(viewerInfo.viewer_id);
+		this._initPeer();
 		viewer.init();
 		editorList.init();
 	},
 
 	// peerの初期化処理
-	initPeer: function (viewerId) {
+	_initPeer: function () {
 		var _self = this;
 		this.myPeer = new Peer({
 			key: 'e2cc565a-4d67-11e4-a512-5552163100a0',
@@ -39,7 +39,10 @@ Connection.prototype = {
 
 		this.myPeer.on('open', function (myPeerId) {
 			console.log('My peer ID Is: ' + myPeerId);
-			sendOffer(viewerId, myPeerId);
+			_self.send({
+				type: 'update_peer_id',
+				data: { 'peer_id': myPeerId }
+			})
 		});
 
 		this.myPeer.on('error', function (err) {
@@ -47,35 +50,34 @@ Connection.prototype = {
 		});
 
 		this.myPeer.on('connection', function (conn) {
+			console.log('metadata: ', conn.metadata);
+			_self.connectionList[conn.metadata.viewerId] = conn;
+
 			conn.on('data', function (data) {
 				_self.onRTC(data);
 			});
-		});
 
-		// 自分が入室した
-		function sendOffer(viewerId, myPeerId) {
-			// メンバーへpeerIDを送信
-			_self.send({
-				type: 'chat_log',
-				data: '[sendOffer]' + JSON.stringify({
-					viewerId: viewerId,
-					peerId: myPeerId,
-					date: new Date().getTime()
-				}) + '[/sendOffer]'
+			conn.on('close', function () {
+				console.log('dataConnection close')
+				conn.close();
+				delete _self.connectionList[conn.metadata.viewerId];
 			});
-		}
+
+			editorList.get(getMyViewerId()).send();
+		});
 	},
 
 	// 自分以外の誰かが入室した
-	onOffer: function (data) {
-		var data = JSON.parse(data);
-		if (new Date().getTime() - data.date > 1000 * 20) {
-			return;
-		}
+	onOffer: function (peerId) {
+		console.log('onOffer', peerId);
 
 		var _self = this;
-		var conn = this.myPeer.connect(data.peerId);
-		this.connectionList[data.viewerId] = conn;
+		var conn = this.myPeer.connect(peerId, {
+			reliable: true,
+			metadata: {
+				viewerId: getMyViewerId()
+			}
+		});
 
 		conn.on('data', function (data) {
 			_self.onRTC(data);
@@ -85,6 +87,12 @@ Connection.prototype = {
 		conn.on('open', function (e) {
 			// TODO: 本人に送れば十分だが、既存の機能で全員に送っているのであとで直す
 			editorList.get(getMyViewerId()).send();
+		});
+
+		conn.on('close', function () {
+			console.log('dataConnection close ---');
+			conn.close();
+			delete _self.connectionList[conn.metadata.viewerId];
 		});
 	},
 
@@ -160,7 +168,7 @@ Connection.prototype = {
 			}
 
 			if (e['viewer']) {
-				_self.init(e['viewer']);
+				_self._init(e['viewer']);
 				lastChatId = 0;
 				lastTime = 0;
 			}

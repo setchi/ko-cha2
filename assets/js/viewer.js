@@ -28,6 +28,10 @@ Viewer.prototype = {
 			} else {
 				this.add(data[i]);
 			}
+
+			if (data[i].peer_id) {
+				connection.onOffer(data[i].peer_id);
+			}
 		}
 	},
 

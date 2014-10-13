@@ -108,6 +108,7 @@ DROP TABLE IF EXISTS `viewer`;
 CREATE TABLE IF NOT EXISTS `viewer` (
   `room_id` varchar(15) collate utf8_unicode_ci default NULL,
   `viewer_id` varchar(300) collate utf8_unicode_ci default NULL,
+  `peer_id` varchar(300) collate utf8_unicode_ci default NULL,
   `name` varchar(50) collate utf8_unicode_ci default NULL,
   `image` varchar(300) collate utf8_unicode_ci default NULL,
   `num` int(11) default '0',
@@ -139,6 +140,7 @@ DROP VIEW IF EXISTS `v_viewer`;
 CREATE TABLE IF NOT EXISTS `v_viewer` (
 `room_id` varchar(15)
 ,`viewer_id` varchar(300)
+,`peer_id` varchar(300)
 ,`name` varchar(50)
 ,`image` varchar(300)
 ,`num` int(11)

@@ -30,11 +30,6 @@ var Chat = {
 				isImage = true;
 				string = this.genImageHTML(data);
 
-			// TODO: WebRTCのpeerID交換にチャットの機能を借りているので専用APIを作る。
-			} else if (data.message.match('\\[sendOffer\\](.*)\\[/sendOffer\\]')) {
-				connection.onOffer(data.message.match('\\[sendOffer\\](.*)\\[/sendOffer\\]')[1]);
-				continue;
-
 			} else {
 				string = this.genRemarkHTML(data);
 			}

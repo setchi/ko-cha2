@@ -72,18 +72,8 @@ class Controller_Room extends Controller_Rest
 				return Response::forge($view);
 			}
 		}
-
-		// 閲覧者ID取得
-		/*
-		$viewer_id = Session::get($room_id.'__viewer_id');
-		if (!$viewer_id) {
-			$viewer_id = Session::key('session_id');
-			Session::set($room_id.'__viewer_id', $viewer_id);
-		}
-		*/
 		
 		// Room閲覧者情報更新
-		// $viewer = Model_Viewer::enter_viewer($room_id, $viewer_id);
 		$view = ViewUtils::view_setup('room/index');
 		$view->room = $room;
 		// $view->viewer = $viewer;
