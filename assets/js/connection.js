@@ -1,14 +1,30 @@
+/**
+ * 部屋の情報
+ * @type {Object}
+ */
 var roomInfo = JSON.parse($('#js_room_info').text());
 
-/**
- * 通信制御
- */
 
+/**
+ * 通信の制御
+ */
 var Connection = function () {
+	/**
+	 * long polling監視開始
+	 */
 	this.watch(-1, -1);
+
+
+	/**
+	 * ViewerIDごとにPeerConnectionを保持する
+	 * @type {Object}
+	 */
 	this.connectionList = {};
 };
 Connection.prototype = {
+	/**
+	 * 接続切断
+	 */
 	_disconnect: function () {
 		this.myPeer.destroy();
 		this.send({
@@ -17,6 +33,11 @@ Connection.prototype = {
 		}, true);
 	},
 
+
+	/**
+	 * 自分のViewerInfoを元に初期化
+	 * @param  {String} viewerInfo
+	 */
 	_init: function (viewerInfo) {
 		roomInfo.viewer = viewerInfo;
 		localSession.add(roomInfo.room.id, viewerInfo.viewer_id);
@@ -31,7 +52,10 @@ Connection.prototype = {
 		}
 	},
 
-	// peerの初期化処理
+
+	/**
+	 * Peer接続の初期化
+	 */
 	_initPeer: function () {
 		var _self = this;
 		this.myPeer = new Peer({
@@ -81,7 +105,11 @@ Connection.prototype = {
 		});
 	},
 
-	// 自分以外の誰かが入室した
+
+	/**
+	 * Peer接続のオファーを受信
+	 * @param  {String} peerId
+	 */
 	onOffer: function (peerId) {
 		console.log('onOffer', peerId);
 
@@ -110,19 +138,32 @@ Connection.prototype = {
 		});
 	},
 
-	// データを受信
+
+	/**
+	 * Peerからデータを受信
+	 * @param  {Object} data
+	 */
 	onRTC: function (data) {
 		dataUpdate(data);
 	},
 
-	// 会話グループにデータ送信
+
+	/**
+	 * 部屋のメンバーにデータ送信
+	 * @param  {Object} data
+	 */
 	sendRTC: function (data) {
 		for (var viewerId in this.connectionList) {
 			this.connectionList[viewerId].send(data);
 		}
 	},
 
-	// long pollingにpush
+
+	/**
+	 * long pollingにpush
+	 * @param  {String} data
+	 * @param  {Boolean} [sync] 同期処理させる場合はtrue
+	 */
 	send: function (data, sync) {
 		var async = !sync;
 		data['viewer_id'] = getMyViewerId();
@@ -141,7 +182,12 @@ Connection.prototype = {
 		});
 	},
 
-	// long polling push監視メソッド
+
+	/**
+	 * long pollingのpushを監視する
+	 * @param  {Number} lastChatId
+	 * @param  {Number} lastTime
+	 */
 	watch: function (lastChatId, lastTime) {
 		var _self = this;
 		var viewerId = getMyViewerId();

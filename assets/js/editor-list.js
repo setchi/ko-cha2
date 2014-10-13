@@ -1,11 +1,17 @@
 /**
- * エディタ全体の処理
+ * エディタ全体の管理
  */
-
 var EditorList = function () {
+	/**
+	 * Viewerごとのエディタのインスタンスを保持するリスト
+	 * @type {Array}
+	 */
 	this.editorList = [];
 }
 EditorList.prototype = {
+	/**
+	 * 初期化
+	 */
 	init: function () {
 		var changeTargetTab = null;
 
@@ -48,12 +54,20 @@ EditorList.prototype = {
 		});
 	},
 
-	// Editorインスタンス追加 (Viewer一人につき一つのエディタ)
+
+	/**
+	 * Editor追加 (Viewer一人につき一つのエディタ)
+	 * @param {String} viewerId
+	 */
 	add: function (viewerId) {
 		this.editorList[viewerId] = new Editor(viewerId, 4).hide();
 	},
 
-	// Editorインスタンスを削除
+
+	/**
+	 * Editor削除
+	 * @param {String} viewerId
+	 */
 	remove: function (viewerId) {
 		for (var id in this.editorList) {
 			if (this.editorList[id] !== viewerId) {
@@ -65,7 +79,11 @@ EditorList.prototype = {
 		}
 	},
 
-	// 表示エディタを切り替える
+
+	/**
+	 * 表示エディタを切り替える
+	 * @param  {String} viewerId
+	 */
 	changeViewingEditor: function (viewerId) {
 		if (void 0 === this.editorList[viewerId]) {
 			console.warn("ユーザー '" + viewerId + "' が存在しません");
@@ -77,7 +95,12 @@ EditorList.prototype = {
 		this.editorList[viewerId].show();
 	},
 
-	// ViewerのEditorインスタンスを取得
+
+	/**
+	 * ViewerのEditorインスタンスを取得。存在しなければ追加する
+	 * @param  {String} viewerId 
+	 * @return {Editor} 該当ViewerのEditorインスタンス
+	 */
 	get: function (viewerId) {
 		if (void 0 === this.editorList[viewerId]) {
 			this.add(viewerId);
@@ -85,7 +108,12 @@ EditorList.prototype = {
 		return this.editorList[viewerId];
 	},
 
-	// 受信データを反映
+
+
+	/**
+	 * 受信データを反映
+	 * @param  {Object} data
+	 */
 	update: function (data) {
 		try {
 			this.get(data.viewerId).get(decodeURIComponent(data.tabName)).applyData(data.data);
@@ -106,16 +134,33 @@ EditorList.prototype = {
 		}
 	},
 
+
+	/**
+	 * リサイズ
+	 * @param  {Number} rootWidth
+	 * @param  {Number} rootHeight
+	 */
 	resize: function (rootWidth, rootHeight) {
 		for (var prop in this.editorList) {
 			this.editorList[prop].resize(rootWidth, rootHeight);
 		}
 	},
 
+
+	/**
+	 * エディタを表示する
+	 * @param  {String} viewerId
+	 */
 	show: function (viewerId) {
 		this.editorList[viewerId].show();
 	},
 
+
+	/**
+	 * エディタのレイアウトを変更する
+	 * @param {String} viewerId
+	 * @param {Number} state    位置フラグ
+	 */
 	setLayout: function (viewerId, state) {
 		if (void 0 === this.editorList[viewerId]) {
 			this.add(viewerId);

@@ -3,10 +3,13 @@
  */
 
 $(function () {
+
 /**
  * エディタの移動先を示す半透明フレームの処理
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b
  */
-
 var MarkFrame = function (r, g, b) {
 	this.markFrame = $('<dvi></div>').addClass('mark-frame').css({
 		'background-color': 'rgba(' + r + ', ' + g + ', ' + b + ', 0.05)',
@@ -18,10 +21,22 @@ var MarkFrame = function (r, g, b) {
 	}).appendTo('body');
 }
 MarkFrame.prototype = {
+
+	/**
+	 * 要素を削除
+	 */
 	remove: function () {
 		this.markFrame.remove();
 	},
 
+
+	/**
+	 * 要素の位置・大きさを変更
+	 * @param  {Number} top
+	 * @param  {Number} left
+	 * @param  {Number} width
+	 * @param  {Number} height
+	 */
 	moveTo: function (top, left, width, height) {
 		this.markFrame.css({
 			'top': top,
@@ -35,8 +50,8 @@ MarkFrame.prototype = {
 
 /**
  * サイドバーの横幅を調整するハンドルのドラッグ処理
+ * @type {Object}
  */
-
 var SidebarHandle = {
 	dragging: false,
 	startX: 0,

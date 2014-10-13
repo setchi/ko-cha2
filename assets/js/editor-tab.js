@@ -1,40 +1,129 @@
 /**
- * 個々のタブの処理
+ * Viewerごとのタブの管理
+ * @param {String} viewerId
+ * @param {String} tabName
  */
-
 var Tab = function (viewerId, tabName) {
+	/**
+	 * エディタのID
+	 * @type {String}
+	 */
 	this.editorId = viewerId + '-' + tabName;
+
+
+	/**
+	 * このタブのviewerId
+	 * @type {String}
+	 */
 	this.viewerId = viewerId;
+
+
+	/**
+	 * タブ名
+	 * @type {String}
+	 */
 	this.tabName = tabName;
+
+
+	/**
+	 * 自身かどうか
+	 * @type {Boolean}
+	 */
 	this.isSelf = viewerId === getMyViewerId();
-	
+
+
+	/**
+	 * タブHTML要素の初期化
+	 */
 	this._initTabElement(viewerId, tabName);
+
+
+	/**
+	 * エディタのルートHTML要素
+	 * @type {Object}
+	 */
 	this.$editor = $(document.getElementById(this.editorId));
+
+
+	/**
+	 * Aceのインスタンス
+	 * @type {Object}
+	 */
 	this.editor = ace.edit(this.editorId);
-	this.fileMoniterTick = null;
+
+
+	/**
+	 * ファイルの更新日時監視タイマー
+	 * @type {Number}
+	 */
+	this.fileMoniterTimer = null;
+
+
+	/**
+	 * ファイルの最終更新日時
+	 * @type {Number}
+	 */
 	this.fileLastMod = -1;
 
+
 	var _self = this;
-	// 受信データ反映時の関数マッピング
+	/**
+	 * 受信データ反映時の処理マッピング
+	 * @type {Object}
+	 */
 	this.update = {
+		/**
+		 * 選択範囲
+		 * @param  {Range} range
+		 */
 		range: function (range) {
 			_self.editor.selection.setSelectionRange(range);
 		},
+
+
+		/**
+		 * スクロール位置
+		 * @param  {Object} scroll
+		 */
 		scroll: function (scroll) {
 			_self.editor.session.setScrollTop(scroll.top);
 			_self.editor.session.setScrollLeft(scroll.left);
 		},
+
+
+		/**
+		 * 言語モード
+		 * @param  {String} mode
+		 */
 		mode: function (mode) {
 			_self.setMode(mode);
 		},
+
+
+		/**
+		 * カラーテーマ
+		 * @param  {String} theme
+		 */
 		theme: function (theme) {
 			_self.setTheme(theme);
 		},
+
+
+		/**
+		 * テキスト
+		 * @param  {String} text
+		 */
 		text: function (text) {
 			var range = _self.editor.session.selection.getRange();
 			_self.editor.setValue(decodeURIComponent(text));
 			_self.editor.selection.setSelectionRange(range);
 		},
+
+
+		/**
+		 * カーソル位置
+		 * @param  {Object} cursor
+		 */
 		cursor: function (cursor) {
 			var current = _self.editor.getCursorPosition();
 			if (cursor.top !== current.top || cursor.left !== current.left) {
@@ -43,9 +132,18 @@ var Tab = function (viewerId, tabName) {
 		}
 	}
 
+
+	/**
+	 * 初期化
+	 */
 	this._init();
 }
 Tab.prototype = {
+	/**
+	 * タブのHTML要素初期化
+	 * @param  {String} viewerId
+	 * @param  {String} tabName
+	 */
 	_initTabElement: function (viewerId, tabName) {
 		var $root = $(document.getElementById(viewerId));
 		var editorRegion = $(document.getElementById('editor-region'));
@@ -56,6 +154,10 @@ Tab.prototype = {
 		$(sprintf(tabItemText, tabName, tabName, tabName)).appendTo($root.find('.tab-list'));
 	},
 
+
+	/**
+	 * 初期化
+	 */
 	_init: function () {		
 		this.editor.session.setUseSoftTabs(true);
 		this.editor.setAnimatedScroll(true);
@@ -70,9 +172,21 @@ Tab.prototype = {
 		}
 	},
 
+
+	/**
+	 * 自身の初期化
+	 * @return {[type]} [description]
+	 */
 	_initSelf: function () {
 		var _self = this;
+		/**
+		 * データを送信する
+		 * @param  {String} type - 送信タイプ
+		 * @param  {Object} data
+		 * @param  {Boolean} toServer - サーバに送信するならtrue
+		 */
 		this.sendData = function (type, data, toServer) {
+			// TODO: この中をもっと整える
 			var editorData = {
 				type: 'editor_change_' + type,
 				data: JSON.stringify({
@@ -104,6 +218,8 @@ Tab.prototype = {
 			'insertLines': 0,
 			'removeLines': 0
 		};
+
+		// イベント登録
 		_self.editor.session.on('change', function (e) {
 			if (!(e.data.action in textChangeActionList)) {
 				return;
@@ -128,7 +244,13 @@ Tab.prototype = {
 		});
 	},
 
-	// 強制的に送信 複数ファイルを一度にドラッグ&ドロップされたときなど
+
+	/**
+	 * タブの情報を送信. 複数ファイルを一度にドラッグ&ドロップされたときなど
+	 * @param  {Object} textData
+	 * @param  {Boolean} toServer - サーバに送信するならtrue
+	 * @return {Tab} 自身
+	 */
 	send: function (textData, toServer) {
 		// サーバー側のremoveTabを上書きするためchange_state
 		this.sendData('state', this.getState(), toServer);
@@ -136,17 +258,26 @@ Tab.prototype = {
 		return this;
 	},
 
-	// タブの状態をサーバに送信
+
+	/**
+	 * タブの情報をサーバに送信
+	 * @param  {Object} textData
+	 */
 	saveToServer: function (textData) {
 		this.send(textData, true);
 	},
 
-	// ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
+	
+	/**
+	 * ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
+	 * @param {File} file
+	 * @param {Function} getTextFromArrayBuffer - ArrayBufferの内容を文字列に変換する関数
+	 */
 	setMoniteringFile: function (file, getTextFromArrayBuffer) {
 		var _self = this;
 		this.fileLastMod = file.lastModifiedDate;
-		clearTimeout(this.fileMoniterTick);
-		this.fileMoniterTick = setInterval(function () {
+		clearInterval(this.fileMoniterTimer);
+		this.fileMoniterTimer = setInterval(function () {
 			if (_self.fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
 				_self.fileLastMod = file.lastModifiedDate;
 				var reader = new FileReader();
@@ -161,43 +292,85 @@ Tab.prototype = {
 		return this;
 	},
 
+
+	/**
+	 * タブを表示する
+	 * @return {Tab} 自身
+	 */
 	show: function () {
 		this.$editor.removeClass('hidden');
 		return this;
 	},
 
+
+	/**
+	 * タブを非表示にする
+	 * @return {Tab} 自身
+	 */
 	hide: function () {
 		this.$editor.addClass('hidden');
 		return this;
 	},
 
+
+	/**
+	 * カラーテーマを変更
+	 * @param {String} theme
+	 * @return {Tab} 自身
+	 */
 	setTheme: function (theme) {
 		theme = "ace/theme/" + theme;
 		this.editor.setTheme( theme );
 		return this;
 	},
 
+
+	/**
+	 * 言語モードを変更
+	 * @param {String} mode
+	 * @return {Tab} 自身
+	 */
 	setMode: function (mode) {
 		mode = "ace/mode/" + mode;
 		this.editor.session.setMode( mode );
 		return this;
 	},
 
+
+	/**
+	 * フォントサイズを変更
+	 * @param {Number} size
+	 * @return {Tab} 自身
+	 */
 	setFontSize: function (size) {
 		this.editor.setFontSize(size|0);
 		return this;
 	},
 
+
+	/**
+	 * リサイズ
+	 * @return {Tab} 自身
+	 */
 	resize: function () {
 		this.editor.resize();
 		return this;
 	},
 
+
+	/**
+	 * エディタのテキストをURIencodeして取得(送信用)
+	 * @return {String} URIencodeされたテキスト
+	 */
 	getText: function () {
 		return encodeURIComponent(this.editor.getValue());
 	},
 
-	// エディタの状態をまとめたオブジェクト生成
+
+	/**
+	 * エディタの状態をまとめたオブジェクト生成
+	 * @return {Object} 送信用データ
+	 */
 	getState: function () {
 		return {
 			scroll: {
@@ -211,7 +384,12 @@ Tab.prototype = {
 		};
 	},
 
-	// 受信データを反映する
+
+	/**
+	 * 受信データを反映する
+	 * @param  {Object} data
+	 * @return {Tab} 自身
+	 */
 	applyData: function (data) {
 		// 入ってきたプロパティだけ反映する
 		for (var prop in data) if (data.hasOwnProperty(prop)) {
@@ -224,9 +402,13 @@ Tab.prototype = {
 		return this;
 	},
 
-	// タブ削除処理
+
+	/**
+	 * タブ削除
+	 * @return {Tab} 自身
+	 */
 	remove: function () {
-		clearTimeout(this.fileMoniterTick);
+		clearInterval(this.fileMoniterTimer);
 		this.editor.destroy();
 		
 		if (this.isSelf) {

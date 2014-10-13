@@ -1,20 +1,74 @@
 ﻿/**
- * 個々のエディタの処理
+ * Viewerごとのエディタの管理
+ * @param {String} viewerId
+ * @param {Number} state 初期位置フラグ
  */
-
 var Editor = function (viewerId, state) {
+	// HTML要素を生成する
 	$('#ko-cha-templates').find('.editor-root').clone().attr('id', viewerId).appendTo('#editor-region');
+
+
+	/**
+	 * このインスタンスのViewerID
+	 * @type {String}
+	 */
 	this.viewerId = viewerId;
+
+
+	/**
+	 * Tabインスタンスを保持するリスト
+	 * @type {Array}
+	 */
 	this.tabList = [];
-	this.currentTabName;
+
+
+	/**
+	 * 現在編集しているタブの名前
+	 * @type {String}
+	 */
+	this.currentTabName = "";
+
+
+	/**
+	 * このエディタのHTMLルート
+	 * @type {Object}
+	 */
 	this.$root = $(document.getElementById(this.viewerId));
+
+
+	/**
+	 * このエディタを現在表示しているか
+	 * @type {Boolean}
+	 */
 	this.viewing = false;
+
+
+	/**
+	 * 現在の位置フラグ
+	 * @type {Number}
+	 */
 	this.state = state;
 	this.setPosition(state);
 
-	// resize用...
+
+	/**
+	 * サイドバーのHTMLルート。リサイズ時にサイズを取得するためキャッシュ。
+	 * @type {Object}
+	 */
 	this.$sidebar = $(document.getElementsByClassName('sidebar'));
+
+
+	/**
+	 * エディタ全体を表示しているHTMLのルート
+	 * @type {Object}
+	 */
 	this.$editorRegion = $(document.getElementById('editor-region'));
+
+
+	/**
+	 * 自身かどうか
+	 * @type {Boolean}
+	 */
 	this.isSelf = viewerId === getMyViewerId();
 
 	if (this.isSelf) {
@@ -22,6 +76,9 @@ var Editor = function (viewerId, state) {
 	}
 }
 Editor.prototype = {
+	/**
+	 * 自身のエディタの初期化
+	 */
 	_initSelfEditor: function () {
 		var _self = this;
 		// 自身のエディタのトップバーをダブルクリックで空タブを生成する
@@ -57,6 +114,12 @@ Editor.prototype = {
 		});
 	},
 
+
+	/**
+	 * 位置フラグから位置とサイズを求める(もっと分かりやすくしたい)
+	 * @param  {Number} state
+	 * @return {Object}
+	 */
 	getSizeRate: function (state) {
 		var rates = { top: 0, left: 0, width: 0, height: 0 };
 		switch (state) {
@@ -83,6 +146,11 @@ Editor.prototype = {
 		return rates;
 	},
 
+
+	/**
+	 * エディタの位置を変更する
+	 * @param {Number} state
+	 */
 	setPosition: function (state) {
 		this.state = state;
 		var rates = this.getSizeRate(state);
@@ -103,14 +171,31 @@ Editor.prototype = {
 		return this;
 	},
 
+
+	/**
+	 * タブの位置を変更する(未実装)
+	 * @param {String} tabName
+	 * @param {Number} state
+	 */
 	setLayout: function (tabName, state) {
 		console.log(tabName, state);
 	},
 
+
+	/**
+	 * 現在の位置フラグを取得
+	 * @return {Number} 位置フラグ
+	 */
 	getPositionState: function () {
 		return this.state
 	},
 
+
+	/**
+	 * タブのインスタンスを取得する。存在しない場合は新しく追加する
+	 * @param  {String} tabName
+	 * @return {Tab} Tabのインスタンス
+	 */
 	get: function (tabName) {
 		if (void 0 === this.tabList[tabName]) {
 			this.addTab(tabName);
@@ -118,6 +203,11 @@ Editor.prototype = {
 		return this.tabList[tabName];
 	},
 
+
+	/**
+	 * タブのインスタンスを追加する
+	 * @param {String} tabName
+	 */
 	addTab: function (tabName) {
 		if (tabName in this.tabList) {
 			console.warn('タブ名が重複しています.');
@@ -132,7 +222,10 @@ Editor.prototype = {
 		return this.tabList[tabName];
 	},
 
-	// 空タブ生成
+
+	/**
+	 * 空タブを生成する
+	 */
 	addEmptyTab: function () {
 		var tabName = 'untitled', index = '';
 		
@@ -148,6 +241,10 @@ Editor.prototype = {
 		});
 	},
 
+
+	/**
+	 * タブをリサイズする
+	 */
 	tabResize: (function () {
 		var timer;
 		return function () {
@@ -160,7 +257,11 @@ Editor.prototype = {
 		}
 	}()),
 
-	// タブ削除。左右にタブがあれば次のタブを表示（左優先）
+
+	/**
+	 * タブ削除。左右にタブがあれば次のタブを表示する（左側優先）
+	 * @param  {String} tabName
+	 */
 	removeTab: function (tabName) {
 		if (void 0 === this.tabList[tabName]) return;
 
@@ -178,12 +279,22 @@ Editor.prototype = {
 		}
 	},
 
+
+	/**
+	 * エディタを非表示にする
+	 * @return {Editor} 自身のインスタンス
+	 */
 	hide: function () {
 		this.viewing = false;
 		this.$root.addClass('hidden');
 		return this;
 	},
 
+
+	/**
+	 * エディタを表示する
+	 * @return {Editor} 自身のインスタンス
+	 */
 	show: function () {
 		this.viewing = true;
 		this.$root.removeClass('hidden');
@@ -191,10 +302,20 @@ Editor.prototype = {
 		return this;
 	},
 
+
+	/**
+	 * エディタを削除する(未実装)
+	 */
 	remove: function () {
-		// do nothing.
+		//
 	},
 
+
+	/**
+	 * リサイズ
+	 * @param  {Number} rootWidth
+	 * @param  {Number} rootHeight
+	 */
 	resize: function (rootWidth, rootHeight) {
 		var rates = this.getSizeRate(this.state);
 		this.$root.add(this.$root.find('.ace_editor')).css({
@@ -210,7 +331,12 @@ Editor.prototype = {
 		}
 	},
 
-	// タブ切り替え
+
+	/**
+	 * タブを切り替える
+	 * @param  {String} tabName
+	 * @return {Tab} 切り替えたタブのインスタンス
+	 */
 	changeActiveTab: function (tabName) {
 		if (!(tabName in this.tabList)) {
 			console.warn("changeActiveTab 指定されたタブが存在しません: " + tabName);
@@ -228,11 +354,21 @@ Editor.prototype = {
 		return this.tabList[tabName];
 	},
 
+
+	/**
+	 * エディタの表示状態を取得
+	 * @return {Boolean}
+	 */
 	isViewing: function () {
 		return this.viewing;
 	},
 
-	// 強制的に送信 入室者に教える為
+
+	/**
+	 * エディタの情報を送信する
+	 * @param  {Boolean} saveToServer サーバーに送るならtrue
+	 * @return {Editor} 自身のインスタンス
+	 */
 	send: function (saveToServer) {
 		for (var tabName in this.tabList) {
 			console.log('sendRTC');
@@ -243,7 +379,11 @@ Editor.prototype = {
 		return this;
 	},
 
-	// エディタの状態をサーバへ保存
+
+	/**
+	 * エディタの情報をサーバーに送信する
+	 * @return {Editor} 自身のインスタンス
+	 */
 	saveToServer: function () {
 		this.send(true);
 		toastr.info('サーバーに保存しました。');

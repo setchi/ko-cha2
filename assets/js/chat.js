@@ -1,25 +1,64 @@
 /**
  * チャットログに関する処理
+ * @type {Object}
  */
-
 var Chat = {
+
+	/**
+	 * チャットログを表示する要素
+	 * @type {HTMLElement}
+	 */
 	$log: $('.chat_log'),
+
+
+	/**
+	 * 初期化済みか
+	 * @type {Boolean}
+	 */
 	initialized: false,
+
+
+	/**
+	 * URLにマッチさせる正規表現
+	 * @type {RegExp}
+	 */
 	regexURL: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
+
+
+	/**
+	 * チャットログのHTMLテンプレート
+	 * @type {String}
+	 */
 	logText: '<div class="letter"><span class="viewer-icon %s" style="background-image:url(%s)"></span>%s</div>',
+
+
+	/**
+	 * リンクのHTMLテンプレート
+	 * @type {String}
+	 */
 	linkText: '<a href="%s" target="_blank">%s</a>',
 
+
+	/**
+	 * 初期化
+	 */
 	init: function () {
 		this.initialized = true;
 		return this;
 	},
 
-	// 受信データをチャットログに反映する
+
+	/**
+	 * 受信データをチャとログに反映する
+	 * @param  {Object} logs      受信したログのリスト
+	 * @param  {Boolean} selfEnter 自身の発言による挿入か
+	 */
 	insert: function (logs, selfEnter) {
 		var html = '';
 
 		for (var i in logs) {
 			var data = logs[i];
+			// TODO: ついさっきスクリプトから挿入した自分の発言が、サーバーからも送られて来るので無視している。もっと構造を整える。
 			if (!selfEnter && this.initialized && roomInfo.viewer.viewer_id === data.viewer_id) continue;
 
 			data.message = decodeURIComponent(data.message);
@@ -35,6 +74,7 @@ var Chat = {
 			}
 			html = string + html;
 			
+			// 自分の更新でなく、今この画面を見ていなければデスクトップ通知を出す
 			if (this.initialized && roomInfo.viewer.viewer_id !== data.viewer_id) {
 				executeIfNotViewing(function () {
 					var myNotification = new Notify('Ko-cha', {
@@ -52,7 +92,12 @@ var Chat = {
 		});
 	},
 
-	// 発言用HTML生成
+
+	/**
+	 * ログHTML生成
+	 * @param  {Object} log
+	 * @return {String} ログHTML
+	 */
 	genRemarkHTML: function (log) {
 		var that = this;
 		var message = this.escapeHTML(log.message).replace(this.regexURL, function () {
@@ -65,7 +110,12 @@ var Chat = {
 		return sprintf(this.logText, log.viewer_id, viewer.getImageUrl(log.image), message);
 	},
 
-	// 画像用HTML生成
+
+	/**
+	 * 画像ログHTML生成
+	 * @param  {Object} log
+	 * @return {String} 画像ログHTML
+	 */
 	genImageHTML: function (log) {
 		var imageName = log.message.match('\\[image\\](.*)\\[/image\\]')[1];
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
@@ -78,6 +128,12 @@ var Chat = {
 		return sprintf(this.logText, log.viewer_id, viewer.getImageUrl(log.image), image);
 	},
 
+
+	/**
+	 * HTML特殊文字をエスケープする
+	 * @param  {String} str
+	 * @return {String} エスケープされた文字列
+	 */
 	escapeHTML: function (str) {
 		var obj = document.createElement('pre');
 		if (typeof obj.textContent != 'undefined') {
@@ -99,6 +155,11 @@ $('.js_chat_send').keydown(function (e) {
 	$(this).val('');
 });
 
+
+/**
+ * 自身の発言
+ * @param  {String} message
+ */
 function sendChat(message) {
 	var data = roomInfo.viewer;
 	data['message'] = encodeURIComponent(message);

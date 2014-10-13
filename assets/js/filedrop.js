@@ -4,6 +4,11 @@
 
 $(function () {
 
+/**
+ * 拡張子から言語を取得
+ * @param  {String} ext - 拡張子
+ * @return {String} 該当言語
+ */
 function getModeByExt(ext) {
 	return {
 		'abp': 'abap',
@@ -62,10 +67,22 @@ function getModeByExt(ext) {
 		'xquery': 'xquery'
 	}[ext.toLocaleLowerCase()] || 'plain_text';
 }
+
+
+/**
+ * ファイル名から言語を取得
+ * @param  {String} fileName
+ * @return {String} 該当言語
+ */
 function getExtByFilename(fileName) {
 	return fileName.substr(fileName.lastIndexOf('.') + 1);
 }
 
+
+/**
+ * 画像をアップロードする
+ * @param  {File} file
+ */
 function uploadImage(file) {
 	var uploadData = new FormData();
 	uploadData.append('file', file);
@@ -82,10 +99,13 @@ function uploadImage(file) {
 			sendChat('[image]' + json[i] + '[/image]');
 		}
 	});
-	return;
 }
 
-// ファイルの内容をエディタに適用する
+
+/**
+ * ファイルの内容をエディタに適用する
+ * @param  {File} file
+ */
 function readFile(file) {
 	if(!window.FileReader) {
 		alert("File API がサポートされていません。");
@@ -118,7 +138,12 @@ function readFile(file) {
 	fileReader.readAsArrayBuffer(file);
 }
 
-// ArrayBufferの内容を文字列に変換する
+
+/**
+ * ArrayBufferの内容を文字列に変換する
+ * @param  {ArrayBuffer} arrayBuffer
+ * @return {String} 文字列
+ */
 function getTextFromArrayBuffer(arrayBuffer) {
 	var array = new Uint8Array(arrayBuffer);
 
@@ -135,6 +160,12 @@ function getTextFromArrayBuffer(arrayBuffer) {
 	return Encoding.codeToString(array);
 }
 
+
+/**
+ * ファイルドロップ時のハンドラ
+ * @param  {Object} e
+ * @return {Boolean} イベントキャンセル
+ */
 function handleDroppedFile(e) {
 	var files = e.originalEvent.dataTransfer.files;
 	
@@ -157,6 +188,7 @@ function handleDroppedFile(e) {
 	return cancelEvent(e);
 }
 
+// イベント登録
 $(document).bind("dragenter", cancelEvent)
 	.bind("dragover", cancelEvent)
 	.bind("drop", handleDroppedFile);
