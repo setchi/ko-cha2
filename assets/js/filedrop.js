@@ -88,7 +88,7 @@ function uploadImage (file) {
 	uploadData.append('file', file);
 
 	$.ajax({
-		url: '/ko-cha2/chat/upload/' + roomInfo.room.id + '.json',
+		url: 'chat/upload/' + roomInfo.room.id + '.json',
 		type: 'post',
 		dataType: 'json',
 		contentType: false,
