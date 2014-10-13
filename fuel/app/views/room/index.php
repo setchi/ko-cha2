@@ -128,8 +128,10 @@
 	echo Asset::js('lib/notify.js');
 	echo Asset::js('common.js');
 	echo Asset::js('utils.js');
-	echo Asset::js('connection.js');
+	echo Asset::js('editor-tab.js');
 	echo Asset::js('editor.js');
+	echo Asset::js('editor-list.js');
+	echo Asset::js('connection.js');
 	echo Asset::js('ui.js');
 	echo Asset::js('viewer.js');
 	echo Asset::js('filedrop.js');

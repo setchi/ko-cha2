@@ -107,7 +107,7 @@ var Chat = {
 			});
 			return sprintf(that.linkText, url, url);
 		});
-		return sprintf(this.logText, log.viewer_id, viewer.getImageUrl(log.image), message);
+		return sprintf(this.logText, log.viewer_id, viewer.getIconUrl(log.image), message);
 	},
 
 
@@ -125,7 +125,7 @@ var Chat = {
 		var thumbUrl = baseUrl + 'thumb-' + imageName.substr(0, imageName.length-3) + thumbExt;
 
 		var image = '画像を送信しました。<a href="' + imageUrl + '" class="fancybox" title=""><img src="' + thumbUrl + '"></a>';
-		return sprintf(this.logText, log.viewer_id, viewer.getImageUrl(log.image), image);
+		return sprintf(this.logText, log.viewer_id, viewer.getIconUrl(log.image), image);
 	},
 
 

@@ -109,7 +109,6 @@ EditorList.prototype = {
 	},
 
 
-
 	/**
 	 * 受信データを反映
 	 * @param  {Object} data
