@@ -9,7 +9,7 @@ $(function () {
  * @param  {String} ext - 拡張子
  * @return {String} 該当言語
  */
-function getModeByExt(ext) {
+function getModeByExt (ext) {
 	return {
 		'abp': 'abap',
 		'as': 'actionscript',
@@ -74,7 +74,7 @@ function getModeByExt(ext) {
  * @param  {String} fileName
  * @return {String} 該当言語
  */
-function getExtByFilename(fileName) {
+function getExtByFilename (fileName) {
 	return fileName.substr(fileName.lastIndexOf('.') + 1);
 }
 
@@ -83,7 +83,7 @@ function getExtByFilename(fileName) {
  * 画像をアップロードする
  * @param  {File} file
  */
-function uploadImage(file) {
+function uploadImage (file) {
 	var uploadData = new FormData();
 	uploadData.append('file', file);
 
@@ -106,7 +106,7 @@ function uploadImage(file) {
  * ファイルの内容をエディタに適用する
  * @param  {File} file
  */
-function readFile(file) {
+function readFile (file) {
 	if(!window.FileReader) {
 		alert("File API がサポートされていません。");
 		return false;
@@ -117,10 +117,10 @@ function readFile(file) {
 	fileReader.onload = function (e) {
 		var targetEditor = editorList.get(roomInfo.viewer.viewer_id);
 		var targetTab = targetEditor.addTab(file.name);
-		var text = getTextFromArrayBuffer(e.target.result);
+		var text = arrayBufferToString(e.target.result);
 
 		// エディタに情報を反映、ファイルの更新監視開始
-		targetTab.setMoniteringFile(file, getTextFromArrayBuffer).applyData({
+		targetTab.setMoniteringFile(file, arrayBufferToString).applyData({
 			text: encodeURIComponent(text),
 			mode: getModeByExt(ext)
 		});
@@ -144,7 +144,7 @@ function readFile(file) {
  * @param  {ArrayBuffer} arrayBuffer
  * @return {String} 文字列
  */
-function getTextFromArrayBuffer(arrayBuffer) {
+function arrayBufferToString (arrayBuffer) {
 	var array = new Uint8Array(arrayBuffer);
 
 	// ArrayBufferを適切なViewで処理 (様々な文字コードに対応させる)
@@ -166,7 +166,7 @@ function getTextFromArrayBuffer(arrayBuffer) {
  * @param  {Object} e
  * @return {Boolean} イベントキャンセル
  */
-function handleDroppedFile(e) {
+function handleDroppedFile (e) {
 	var files = e.originalEvent.dataTransfer.files;
 	
 	for (var i = 0; i < files.length; i++) {

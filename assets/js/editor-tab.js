@@ -174,7 +174,7 @@ Tab.prototype = {
 
 
 	/**
-	 * 自身の初期化
+	 * 自身の初期化(エディタが操作されたらメンバーに送信など)
 	 * @return {[type]} [description]
 	 */
 	_initSelf: function () {
@@ -211,25 +211,26 @@ Tab.prototype = {
 			connection.sendRTC(sendData);
 		}
 
-		var timer = null;
-		var textChangeActionList = {
-			'insertText': 0,
-			'removeText': 0,
-			'insertLines': 0,
-			'removeLines': 0
-		};
-
 		// イベント登録
-		_self.editor.session.on('change', function (e) {
-			if (!(e.data.action in textChangeActionList)) {
-				return;
-			}
+		_self.editor.session.on('change', (function () {
+			var timer = null;
+			var sendActionList = [
+				'insertText',
+				'removeText',
+				'insertLines',
+				'removeLines'
+			];
+			return function (e) {
+				if (sendActionList.indexOf(e.data.action) == -1) {
+					return;
+				}
 
-			clearTimeout(timer);
-			setTimeout(function () {
-				_self.sendData('text', { text: _self.getText() });
-			}, 5);
-		});
+				clearTimeout(timer);
+				setTimeout(function () {
+					_self.sendData('text', { text: _self.getText() });
+				}, 5);
+			}
+		}()));
 		_self.editor.session.on('changeScrollLeft', function () {
 			_self.sendData('state', _self.getState());
 		});
@@ -271,24 +272,27 @@ Tab.prototype = {
 	/**
 	 * ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
 	 * @param {File} file
-	 * @param {Function} getTextFromArrayBuffer - ArrayBufferの内容を文字列に変換する関数
+	 * @param {Function} arrayBufferToString - ArrayBufferの内容を文字列に変換する関数
 	 */
-	setMoniteringFile: function (file, getTextFromArrayBuffer) {
+	setMoniteringFile: function (file, arrayBufferToString) {
 		var _self = this;
 		this.fileLastMod = file.lastModifiedDate;
-		clearInterval(this.fileMoniterTimer);
-		this.fileMoniterTimer = setInterval(function () {
+
+		function applyIfUpdated() {
 			if (_self.fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
 				_self.fileLastMod = file.lastModifiedDate;
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					_self.applyData({
-						text: getTextFromArrayBuffer(e.target.result)
+						text: arrayBufferToString(e.target.result)
 					});
 				}
 				reader.readAsArrayBuffer(file);
 			}
-		}, 1000);
+		}
+
+		clearInterval(this.fileMoniterTimer);
+		this.fileMoniterTimer = setInterval(applyIfUpdated, 1000);
 		return this;
 	},
 
@@ -360,7 +364,7 @@ Tab.prototype = {
 
 	/**
 	 * エディタのテキストをURIencodeして取得(送信用)
-	 * @return {String} URIencodeされたテキスト
+	 * @return {String} 送信用テキスト
 	 */
 	getText: function () {
 		return encodeURIComponent(this.editor.getValue());
@@ -368,7 +372,7 @@ Tab.prototype = {
 
 
 	/**
-	 * エディタの状態をまとめたオブジェクト生成
+	 * エディタの状態をまとめた送信用オブジェクト生成
 	 * @return {Object} 送信用データ
 	 */
 	getState: function () {
@@ -396,7 +400,7 @@ Tab.prototype = {
 			if (prop in this.update) {
 				this.update[prop](data[prop]);
 			} else {
-				console.log('プロパティがありません。', data);
+				console.warn('無効なプロパティ: ', data);
 			}
 		}
 		return this;
