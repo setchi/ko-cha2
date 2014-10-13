@@ -69,14 +69,10 @@ EditorList.prototype = {
 	 * @param {String} viewerId
 	 */
 	remove: function (viewerId) {
-		for (var id in this.editorList) {
-			if (this.editorList[id] !== viewerId) {
-				continue;
-			}
-			this.editorList[id].remove();
-			delete this.editorList[id];
-			break;
-		}
+		if (!(viewerId) in this.editorList) return;
+		
+		this.editorList[viewerId].remove();
+		delete this.editorList[viewerId];
 	},
 
 
