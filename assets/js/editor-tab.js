@@ -211,26 +211,19 @@ Tab.prototype = {
 			connection.sendRTC(sendData);
 		}
 
+		var sendActionList = [
+			'insertText',
+			'removeText',
+			'insertLines',
+			'removeLines'
+		];
 		// イベント登録
-		_self.editor.session.on('change', (function () {
-			var timer = null;
-			var sendActionList = [
-				'insertText',
-				'removeText',
-				'insertLines',
-				'removeLines'
-			];
-			return function (e) {
-				if (sendActionList.indexOf(e.data.action) == -1) {
-					return;
-				}
-
-				clearTimeout(timer);
-				setTimeout(function () {
-					_self.sendData('text', { text: _self.getText() });
-				}, 5);
+		_self.editor.session.on('change', function (e) {
+			if (sendActionList.indexOf(e.data.action) == -1) {
+				return;
 			}
-		}()));
+			_self.sendData('text', { text: _self.getText() });
+		});
 		_self.editor.session.on('changeScrollLeft', function () {
 			_self.sendData('state', _self.getState());
 		});
