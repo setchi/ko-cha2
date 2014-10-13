@@ -17,25 +17,25 @@ var Tab = function (viewerId, tabName) {
 	var _self = this;
 	// 受信データ反映時の関数マッピング
 	this.update = {
-		range: function (_self, range) {
+		range: function (range) {
 			_self.editor.selection.setSelectionRange(range);
 		},
-		scroll: function (_self, scroll) {
+		scroll: function (scroll) {
 			_self.editor.session.setScrollTop(scroll.top);
 			_self.editor.session.setScrollLeft(scroll.left);
 		},
-		mode: function (_self, mode) {
+		mode: function (mode) {
 			_self.setMode(mode);
 		},
-		theme: function (_self, theme) {
+		theme: function (theme) {
 			_self.setTheme(theme);
 		},
-		text: function (_self, text) {
+		text: function (text) {
 			var range = _self.editor.session.selection.getRange();
 			_self.editor.setValue(decodeURIComponent(text));
 			_self.editor.selection.setSelectionRange(range);
 		},
-		cursor: function (_self, cursor) {
+		cursor: function (cursor) {
 			var current = _self.editor.getCursorPosition();
 			if (cursor.top !== current.top || cursor.left !== current.left) {
 				_self.editor.moveCursorToPosition(cursor);
@@ -216,7 +216,7 @@ Tab.prototype = {
 		// 入ってきたプロパティだけ反映する
 		for (var prop in data) if (data.hasOwnProperty(prop)) {
 			if (prop in this.update) {
-				this.update[prop](this, data[prop]);
+				this.update[prop](data[prop]);
 			} else {
 				console.log('プロパティがありません。', data);
 			}
