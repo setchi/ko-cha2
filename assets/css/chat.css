@@ -82,7 +82,7 @@ header.navbar {
 	animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
 }
 
-.viewer-list li.active {
+.viewer-list li.active-viewer {
 	opacity: 1;
 }
 

@@ -27,7 +27,7 @@ Viewer.prototype = {
 		});
 		// 自分自身をビューワーリストに追加して、自分のエディタを全画面で表示する
 		this.add(roomInfo.viewer);
-		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active');
+		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
 		editorList.setLayout(roomInfo.viewer.viewer_id, 4);
 
 		// SNSログイン
@@ -92,7 +92,7 @@ Viewer.prototype = {
 	setActive: function (viewerId, active) {
 		if (viewerId === getMyViewerId()) return;
 
-		$('.viewer-list').find('[data-viewer-id="' + viewerId + '"]')[active ? 'addClass' : 'removeClass']('active');
+		$('.viewer-list').find('[data-viewer-id="' + viewerId + '"]')[active ? 'addClass' : 'removeClass']('active-viewer');
 	},
 
 
