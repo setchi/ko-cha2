@@ -12,7 +12,7 @@ var Connection = function () {
 	/**
 	 * long polling監視開始
 	 */
-	this.watch(-1, -1);
+	this._watch(-1, -1);
 
 
 	/**
@@ -95,13 +95,17 @@ Connection.prototype = {
 				_self.onRTC(data);
 			});
 
+			conn.on('open', function () {
+				editorList.get(getMyViewerId()).send();
+				viewer.setActive(conn.metadata.viewerId, true);
+			});
+
 			conn.on('close', function () {
 				console.log('dataConnection close')
+				viewer.setActive(conn.metadata.viewerId, false);
 				conn.close();
 				delete _self.connectionList[conn.metadata.viewerId];
 			});
-
-			editorList.get(getMyViewerId()).send();
 		});
 	},
 
@@ -129,10 +133,12 @@ Connection.prototype = {
 		conn.on('open', function (e) {
 			// TODO: 本人に送れば十分だが、既存の機能で全員に送っているのであとで直す
 			editorList.get(getMyViewerId()).send();
+			viewer.setActive(conn.metadata.viewerId, true);
 		});
 
 		conn.on('close', function () {
 			console.log('dataConnection close ---');
+			viewer.setActive(conn.metadata.viewerId, false);
 			conn.close();
 			delete _self.connectionList[conn.metadata.viewerId];
 		});
@@ -188,7 +194,7 @@ Connection.prototype = {
 	 * @param  {Number} lastChatId
 	 * @param  {Number} lastTime
 	 */
-	watch: function (lastChatId, lastTime) {
+	_watch: function (lastChatId, lastTime) {
 		var _self = this;
 		var viewerId = getMyViewerId();
 
@@ -207,7 +213,7 @@ Connection.prototype = {
 				// location.reload();
 				console.warn('Error!', e);
 				setTimeout(function () {
-					_self.watch(lastChatId, lastTime);
+					_self._watch(lastChatId, lastTime);
 				}, 500);
 				return;
 			}
@@ -224,9 +230,9 @@ Connection.prototype = {
 				lastTime = 0;
 			}
 
-			_self.watch(lastChatId, lastTime);
+			_self._watch(lastChatId, lastTime);
 		}).fail(function () {
-			_self.watch(lastChatId, lastTime);
+			_self._watch(lastChatId, lastTime);
 		});
 	}
 }

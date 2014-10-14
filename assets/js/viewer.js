@@ -27,6 +27,7 @@ Viewer.prototype = {
 		});
 		// 自分自身をビューワーリストに追加して、自分のエディタを全画面で表示する
 		this.add(roomInfo.viewer);
+		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active');
 		editorList.setLayout(roomInfo.viewer.viewer_id, 4);
 	},
 
@@ -77,6 +78,17 @@ Viewer.prototype = {
 
 
 	/**
+	 * Viewerがアクティブかを設定
+	 * @param {Boolean} active
+	 */
+	setActive: function (viewerId, active) {
+		if (viewerId === getMyViewerId()) return;
+
+		$('.viewer-list').find('[data-viewer-id="' + viewerId + '"]')[active ? 'addClass' : 'removeClass']('active');
+	},
+
+
+	/**
 	 * ユーザーアイコンのHTML生成
 	 * @param  {Object} data
 	 * @return {String} HTML
@@ -94,7 +106,6 @@ Viewer.prototype = {
 	 */
 	changeIcon: (function () {
 		var viewerInfoMap = {};
-
 
 		return function (image, viewerId) {
 			if (viewerId === roomInfo.viewer.viewer_id) {
