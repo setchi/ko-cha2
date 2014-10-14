@@ -29,6 +29,13 @@ Viewer.prototype = {
 		this.add(roomInfo.viewer);
 		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active');
 		editorList.setLayout(roomInfo.viewer.viewer_id, 4);
+
+		// SNSログイン
+		$('.sns-login').find('span').click(function () {
+			var sns = $(this).data('sns');
+			var url = 'auth/login/' + sns;
+			window.open(url, '', 'width=800,height=500');
+		});
 	},
 
 
@@ -139,11 +146,3 @@ function snsApply(image, name) {
 		}
 	});
 }
-
-
-// SNSログイン
-$('.sns-login').find('span').click(function () {
-	var sns = $(this).data('sns');
-	var url = 'auth/login/' + sns;
-	window.open(url, '', 'width=800,height=500');
-});
