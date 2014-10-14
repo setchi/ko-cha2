@@ -85,9 +85,9 @@ Viewer.prototype = {
 
 
 	/**
-	 * Viewerがアクティブ化を設定
+	 * Viewerのアクティブ設定
 	 * @param {String} viewerId
-	 * @param {String} active
+	 * @param {Boolean} active
 	 */
 	setActive: function (viewerId, active) {
 		if (viewerId === getMyViewerId()) return;

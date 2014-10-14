@@ -16,7 +16,7 @@ var Connection = function () {
 
 
 	/**
-	 * ViewerIDごとにPeerConnectionを保持する
+	 * ViewerごとのPeerのインスタンスを保持する
 	 * @type {Object}
 	 */
 	this.connectionList = {};
@@ -35,12 +35,12 @@ Connection.prototype = {
 
 
 	/**
-	 * 自分のViewerInfoを元に初期化
-	 * @param  {String} viewerInfo
+	 * 初期化
+	 * @param  {String} selfViewerInfo
 	 */
-	_init: function (viewerInfo) {
-		roomInfo.viewer = viewerInfo;
-		localSession.add(roomInfo.room.id, viewerInfo.viewer_id);
+	_init: function (selfViewerInfo) {
+		roomInfo.viewer = selfViewerInfo;
+		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
 		this._initPeer();
 		viewer.init();
 		editorList.init();
