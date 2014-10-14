@@ -80,10 +80,11 @@ function getExtByFilename (fileName) {
 
 
 /**
- * 画像をアップロードする
- * @param  {File} file
+ * ファイルをアップロードする
+ * @param  {File}   file
+ * @param  {Function} callback
  */
-function uploadImage (file) {
+function uploadFile (file, callback) {
 	var uploadData = new FormData();
 	uploadData.append('file', file);
 
@@ -94,11 +95,7 @@ function uploadImage (file) {
 		contentType: false,
 		processData: false,
 		data: uploadData
-	}).done(function (json) {
-		for (var i in json) {
-			sendChat('[image]' + json[i] + '[/image]');
-		}
-	});
+	}).done(callback);
 }
 
 
@@ -179,7 +176,11 @@ function handleDroppedFile (e) {
 		}
 		// 画像がドロップされた
 		if (file.type.match('image.*')) {
-			uploadImage(file);
+			uploadFile(file, function (json) {
+				for (var i in json) {
+					Chat.send('[image]' + json[i] + '[/image]');
+				}
+			});
 		} else {
 			readFile(file);
 		}

@@ -142,6 +142,34 @@ var Chat = {
 			obj.innerText = str;
 		}
 		return obj.innerHTML;
+	},
+
+
+	/**
+	 * 発言する
+	 * @param  {String} message
+	 */
+	send: function (message) {
+		var data = roomInfo.viewer;
+		data['message'] = encodeURIComponent(message);
+		this.insert([data], true);
+
+		//*
+		connection.sendRTC({
+			updated: true,
+			chat_log: [{
+				viewer_id: getMyViewerId(),
+				image: roomInfo.viewer.image,
+				message: encodeURIComponent(message)
+			}]
+		});
+
+		/*/
+		connection.send({
+			type: 'chat_log',
+			data: message
+		});
+		// */
 	}
 }
 
@@ -151,34 +179,7 @@ $('.js_chat_send').keydown(function (e) {
 		message = $(this).val();
 
 	if (eCode !== 13 || !message) return;
-	sendChat(message);
+	Chat.send(message);
 	$(this).val('');
 });
 
-
-/**
- * 自身の発言
- * @param  {String} message
- */
-function sendChat(message) {
-	var data = roomInfo.viewer;
-	data['message'] = encodeURIComponent(message);
-	Chat.insert([data], true);
-
-	//*
-	connection.sendRTC({
-		updated: true,
-		chat_log: [{
-			viewer_id: getMyViewerId(),
-			image: roomInfo.viewer.image,
-			message: encodeURIComponent(message)
-		}]
-	});
-
-	/*/
-	connection.send({
-		type: 'chat_log',
-		data: message
-	});
-	// */
-}
