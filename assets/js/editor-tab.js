@@ -175,17 +175,17 @@ Tab.prototype = {
 
 	/**
 	 * 自身の初期化(エディタが操作されたらメンバーに送信など)
-	 * @return {[type]} [description]
 	 */
 	_initSelf: function () {
 		var _self = this;
+
 		/**
 		 * データを送信する
 		 * @param  {String} type - 送信タイプ
 		 * @param  {Object} data
 		 * @param  {Boolean} toServer - サーバに送信するならtrue
 		 */
-		this.sendData = function (type, data, toServer) {
+		this._sendData = function (type, data, toServer) {
 			// TODO: この中をもっと整える
 			var editorData = {
 				type: 'editor_change_' + type,
@@ -222,19 +222,19 @@ Tab.prototype = {
 			if (sendActionList.indexOf(e.data.action) == -1) {
 				return;
 			}
-			_self.sendData('text', { text: _self.getText() });
+			_self._sendData('text', { text: _self.getText() });
 		});
 		_self.editor.session.on('changeScrollLeft', function () {
-			_self.sendData('state', _self.getState());
+			_self._sendData('state', _self.getState());
 		});
 		_self.editor.session.on('changeScrollTop', function () {
-			_self.sendData('state', _self.getState());
+			_self._sendData('state', _self.getState());
 		});
 		_self.editor.session.selection.on('changeSelection', function () {
-			_self.sendData('state', _self.getState());
+			_self._sendData('state', _self.getState());
 		});
 		_self.editor.session.selection.on('changeCursor', function () {
-			_self.sendData('state', _self.getState());
+			_self._sendData('state', _self.getState());
 		});
 	},
 
@@ -247,8 +247,8 @@ Tab.prototype = {
 	 */
 	send: function (textData, toServer) {
 		// サーバー側のremoveTabを上書きするためchange_state
-		this.sendData('state', this.getState(), toServer);
-		this.sendData('text', textData, toServer);
+		this._sendData('state', this.getState(), toServer);
+		this._sendData('text', textData, toServer);
 		return this;
 	},
 
