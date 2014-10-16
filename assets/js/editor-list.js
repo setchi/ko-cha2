@@ -55,7 +55,7 @@ EditorList.prototype = {
 			changeTargetTab = editorList.get(viewerId).changeActiveTab(tabName);
 
 			if (changeTargetTab.isSelf) {
-				// 初期値代入
+				// 現在値代入
 				$('#changeTabMode').val(changeTargetTab.getState().mode);
 				$('#changeTabTheme').val(changeTargetTab.getState().theme);
 				$('#changeTabFontSize').val(changeTargetTab.getState().fontsize);
