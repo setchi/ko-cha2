@@ -110,6 +110,15 @@ var Tab = function (viewerId, tabName) {
 
 
 		/**
+		 * フォントサイズ
+		 * @param  {Number} size
+		 */
+		fontsize: function (size) {
+			_self.setFontSize(size);
+		},
+
+
+		/**
 		 * テキスト
 		 * @param  {String} text
 		 */
@@ -377,7 +386,8 @@ Tab.prototype = {
 			cursor: this.editor.getCursorPosition(),
 			range: this.editor.session.selection.getRange(),
 			theme: this.editor.getTheme().substr(10),
-			mode: this.editor.session.getMode().$id.substr(9)
+			mode: this.editor.session.getMode().$id.substr(9),
+			fontsize: parseInt(this.$editor.css('font-size'))
 		};
 	},
 

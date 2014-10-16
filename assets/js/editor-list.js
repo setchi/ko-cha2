@@ -15,7 +15,7 @@ EditorList.prototype = {
 	init: function () {
 		var changeTargetTab = null;
 
-		// 言語が変更されたら反映＆メンバーに送信
+		// 言語変更
 		$(document).on('change', '#changeTabMode', function (e) {
 			if (!changeTargetTab) return cancelEvent(e);
 			var mode = $(this).val();
@@ -23,8 +23,29 @@ EditorList.prototype = {
 			changeTargetTab.applyData({
 				mode: mode
 			}).send({
-				text: changeTargetTab.getText(),
 				mode: mode
+			}).editor.focus();
+
+		// テーマ変更
+		}).on('change', '#changeTabTheme', function (e) {
+			if (!changeTargetTab) return cancelEvent(e);
+			var theme = $(this).val();
+
+			changeTargetTab.applyData({
+				theme: theme
+			}).send({
+				theme: theme
+			}).editor.focus();
+
+		// フォントサイズ変更
+		}).on('change', '#changeTabFontSize', function (e) {
+			if (!changeTargetTab) return cancelEvent(e);
+			var fontSize = $(this).val();
+
+			changeTargetTab.applyData({
+				fontsize: fontSize
+			}).send({
+				fontsize: fontSize
 			}).editor.focus();
 
 		// タブが右クリックされたら言語選択プルダウンを表示
@@ -35,7 +56,9 @@ EditorList.prototype = {
 
 			if (changeTargetTab.isSelf) {
 				// 初期値代入
-				$(document.getElementById('changeTabMode')).val(changeTargetTab.getState().mode);
+				$('#changeTabMode').val(changeTargetTab.getState().mode);
+				$('#changeTabTheme').val(changeTargetTab.getState().theme);
+				$('#changeTabFontSize').val(changeTargetTab.getState().fontsize);
 			} else {
 				return cancelEvent(e);
 			}
@@ -45,7 +68,7 @@ EditorList.prototype = {
 			selector: '#' + getMyViewerId() + ' .tab-item',
 			items: {
 				changeTabMode: {
-					name: '言語設定<select id="changeTabMode" class="form-control"><option value="abap">ABAP</option><option value="actionscript">ActionScript</option><option value="c_cpp">C++</option><option value="c_cpp">C</option><option value="cobol">COBOL</option><option value="coffee">CoffeeScript</option><option value="csharp">C#</option><option value="css">CSS</option><option value="clojure">Clojure</option><option value="d">D</option><option value="dart">Dart</option><option value="erlang">Erlang</option><option value="forth">Forth</option><option value="golang">Go</option><option value="groovy">Groovy</option><option value="haskell">Haskell</option><option value="haxe">Haxe</option><option value="java">Java</option><option value="javascript">JavaScript</option><option value="jsx">JSX</option><option value="lisp">Lisp</option><option value="lsl">LSL</option><option value="lua">Lua</option><option value="matlab">MATLAB</option><option value="mysql">MySQL</option><option value="objectivec">Objective-C</option><option value="markdown">Markdown</option><option value="ocaml">OCaml</option><option value="pascal">Pascal</option><option value="perl">Perl</option><option value="php">PHP</option><option value="plain_text">Plain Text</option><option value="prolog">Prolog</option><option value="python">Python</option><option value="r">R</option><option value="ruby">Ruby</option><option value="rust">Rust</option><option value="scala">Scala</option><option value="scheme">Scheme</option><option value="sh">ShellScript</option><option value="latex">LaTeX</option><option value="typescript">TypeScript</option><option value="vbscript">VBScript</option><option value="verilog">Verilog</option><option value="assembly_x86">Assembly x86</option><option value="xml">XML</option><option value="xquery">XQuery</option></select>',
+					name: '言語設定<select id="changeTabMode" class="form-control"><option value="abap">ABAP</option><option value="actionscript">ActionScript</option><option value="c_cpp">C++</option><option value="c_cpp">C</option><option value="cobol">COBOL</option><option value="coffee">CoffeeScript</option><option value="csharp">C#</option><option value="css">CSS</option><option value="clojure">Clojure</option><option value="d">D</option><option value="dart">Dart</option><option value="erlang">Erlang</option><option value="forth">Forth</option><option value="golang">Go</option><option value="groovy">Groovy</option><option value="haskell">Haskell</option><option value="haxe">Haxe</option><option value="java">Java</option><option value="javascript">JavaScript</option><option value="jsx">JSX</option><option value="lisp">Lisp</option><option value="lsl">LSL</option><option value="lua">Lua</option><option value="matlab">MATLAB</option><option value="mysql">MySQL</option><option value="objectivec">Objective-C</option><option value="markdown">Markdown</option><option value="ocaml">OCaml</option><option value="pascal">Pascal</option><option value="perl">Perl</option><option value="php">PHP</option><option value="plain_text">Plain Text</option><option value="prolog">Prolog</option><option value="python">Python</option><option value="r">R</option><option value="ruby">Ruby</option><option value="rust">Rust</option><option value="scala">Scala</option><option value="scheme">Scheme</option><option value="sh">ShellScript</option><option value="latex">LaTeX</option><option value="typescript">TypeScript</option><option value="vbscript">VBScript</option><option value="verilog">Verilog</option><option value="assembly_x86">Assembly x86</option><option value="xml">XML</option><option value="xquery">XQuery</option></select>テーマ<select id="changeTabTheme" class="form-control"><optgroup label="Bright"><option value="chrome">Chrome</option><option value="clouds">Clouds</option><option value="crimson_editor">Crimson Editor</option><option value="dawn">Dawn</option><option value="dreamweaver">Dreamweaver</option><option value="eclipse">Eclipse</option><option value="github">GitHub</option><option value="solarized_light">Solarized Light</option><option value="textmate">TextMate</option><option value="tomorrow">Tomorrow</option><option value="xcode">XCode</option><option value="kuroir">Kuroir</option><option value="katzenmilch">KatzenMilch</option></optgroup><optgroup label="Dark"><option value="ambiance">Ambiance</option><option value="chaos">Chaos</option><option value="clouds_midnight">Clouds Midnight</option><option value="cobalt">Cobalt</option><option value="idle_fingers">idle Fingers</option><option value="kr_theme">krTheme</option><option value="merbivore">Merbivore</option><option value="merbivore_soft">Merbivore Soft</option><option value="mono_industrial">Mono Industrial</option><option value="monokai">Monokai</option><option value="pastel_on_dark">Pastel on dark</option><option value="solarized_dark">Solarized Dark</option><option value="terminal">Terminal</option><option value="tomorrow_night">Tomorrow Night</option><option value="tomorrow_night_blue">Tomorrow Night Blue</option><option value="tomorrow_night_bright">Tomorrow Night Bright</option><option value="tomorrow_night_eighties">Tomorrow Night 80s</option><option value="twilight">Twilight</option><option value="vibrant_ink">Vibrant Ink</option></optgroup></select>フォントサイズ<select id="changeTabFontSize" class="form-control"><option value="10">10px</option><option value="11">11px</option><option value="12" selected="selected">12px</option><option value="13">13px</option><option value="14">14px</option><option value="16">16px</option><option value="18">18px</option><option value="20">20px</option><option value="24">24px</option></select>',
 					callback: function(e){
 						return false;
 					}
