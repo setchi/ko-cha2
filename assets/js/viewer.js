@@ -16,6 +16,13 @@ var Viewer = function (editorList) {
 	 * @type {EditorList}
 	 */
 	this.editorList = editorList;
+
+
+	/**
+	 * Viewerの情報を保持する
+	 * @type {Object}
+	 */
+	this.viewerInfoList = {};
 }
 Viewer.prototype = {
 	/**
@@ -28,7 +35,7 @@ Viewer.prototype = {
 		// 自分自身をビューワーリストに追加して、自分のエディタを全画面で表示する
 		this.add(roomInfo.viewer);
 		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
-		editorList.setLayout(roomInfo.viewer.viewer_id, 4);
+		this.editorList.setLayout(roomInfo.viewer.viewer_id, 4);
 
 		// SNSログイン
 		$('.sns-login').find('span').click(function () {
@@ -68,6 +75,7 @@ Viewer.prototype = {
 	 * @param {Object} data
 	 */
 	add: function (data) {
+		this.viewerInfoList[data.viewer_id] = data;
 		this.editorList.add(data.viewer_id);
 		var image = this.getIconUrl(data.image);
 
@@ -91,8 +99,14 @@ Viewer.prototype = {
 	 */
 	setActive: function (viewerId, active) {
 		if (viewerId === getMyViewerId()) return;
+		var $viewerIcon = $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]');
 
-		$('.viewer-list').find('[data-viewer-id="' + viewerId + '"]')[active ? 'addClass' : 'removeClass']('active-viewer');
+		if (active === $viewerIcon.hasClass('active-viewer')) return;
+		$viewerIcon[active ? 'addClass' : 'removeClass']('active-viewer');
+
+		// 右上の通知
+		var iconUrl = this.getIconUrl(this.viewerInfoList[viewerId].image);
+		toastr.info('<img src="' + iconUrl + '" width="32" height="32"> --- ' + (active ? '入室' : '退室') + 'しました。');
 	},
 
 
@@ -112,22 +126,15 @@ Viewer.prototype = {
 	 * @param  {String} image - 新しいアイコンのURL
 	 * @param  {String} viewerId
 	 */
-	changeIcon: (function () {
-		var viewerInfoMap = {};
-
-		return function (image, viewerId) {
-			if (viewerId === roomInfo.viewer.viewer_id) {
-				roomInfo.viewer.image = image;
-			}
-			if (!(viewerId in viewerInfoMap)) {
-				viewerInfoMap[viewerId] = "";
-			}
-			if (viewerInfoMap[viewerId] !== image) {
-				viewerInfoMap[viewerId] = image;
-				$('.' + viewerId).css('background-image', 'url(' + image + ')');
-			}
+	changeIcon: function (image, viewerId) {
+		if (viewerId === roomInfo.viewer.viewer_id) {
+			roomInfo.viewer.image = image;
 		}
-	}())
+		if (this.viewerInfoList[viewerId] !== image) {
+			this.viewerInfoList[viewerId].image = image;
+			$('.' + viewerId).css('background-image', 'url(' + image + ')');
+		}
+	}
 }
 
 var viewer = new Viewer(editorList);
