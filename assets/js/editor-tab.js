@@ -124,8 +124,14 @@ var Tab = function (viewerId, tabName) {
 		 */
 		text: function (text) {
 			var range = _self.editor.session.selection.getRange();
+			var scrollTop = _self.editor.session.getScrollTop();
+			var scrollLeft = _self.editor.session.getScrollLeft();
+
 			_self.editor.setValue(decodeURIComponent(text));
+
 			_self.editor.selection.setSelectionRange(range);
+			_self.editor.session.setScrollTop(scrollTop);
+			_self.editor.session.setScrollLeft(scrollLeft);
 		},
 
 
