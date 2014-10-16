@@ -64,6 +64,10 @@
 		</ul>
 	</div>
 
+	<div class="panel panel-default">
+		<img src="assets/img/ko-cha2_s.png" alt="画面イメージ" width="100%">
+	</div>
+
 <?php echo $footer ?>
 </div>
 <?php
