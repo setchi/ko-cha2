@@ -16,17 +16,17 @@ var Connection = function () {
 
 
 	/**
-	 * ViewerごとのPeerのインスタンスを保持する
-	 * @type {Object}
+	 * viewerIdごとのDataConnectionのインスタンスを保持する
+	 * @type {Map<String, DataConnection>}
 	 */
-	this.connectionList = {};
+	this._connectionList = {};
 };
 Connection.prototype = {
 	/**
 	 * 接続切断
 	 */
 	_disconnect: function () {
-		this.myPeer.destroy();
+		this.peer.destroy();
 		this.send({
 			type: 'exit_viewer',
 			data: roomInfo.viewer.viewer_id
@@ -42,7 +42,7 @@ Connection.prototype = {
 		roomInfo.viewer = selfViewerInfo;
 		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
 		this._initPeer();
-		viewer.init();
+		viewer.init(selfViewerInfo.viewer_id);
 		editorList.init();
 
 		// ページを離れるとき
@@ -58,7 +58,7 @@ Connection.prototype = {
 	 */
 	_initPeer: function () {
 		var _self = this;
-		this.myPeer = new Peer({
+		this.peer = new Peer({
 			key: 'e2cc565a-4d67-11e4-a512-5552163100a0',
 			config: {
 				iceServers: [{
@@ -75,7 +75,7 @@ Connection.prototype = {
 			}
 		});
 
-		this.myPeer.on('open', function (myPeerId) {
+		this.peer.on('open', function (myPeerId) {
 			console.log('My peer ID Is: ' + myPeerId);
 			_self.send({
 				type: 'update_peer_id',
@@ -83,29 +83,36 @@ Connection.prototype = {
 			})
 		});
 
-		this.myPeer.on('error', function (err) {
+		this.peer.on('error', function (err) {
 			console.log(err);
 		});
 
-		this.myPeer.on('connection', function (conn) {
+		this.peer.on('connection', function (conn) {
 			console.log('metadata: ', conn.metadata);
-			_self.connectionList[conn.metadata.viewerId] = conn;
+			_self._connectionList[conn.metadata.viewerId] = conn;
+			_self._setupDataConnection(conn);
+		});
+	},
 
-			conn.on('data', function (data) {
-				_self.onRTC(data);
-			});
 
-			conn.on('open', function () {
-				editorList.get(getMyViewerId()).send();
-				viewer.setActive(conn.metadata.viewerId, true);
-			});
+	/**
+	 * PeerJS DataConnectionのセットアップ
+	 * @param  {DataConnection} conn
+	 */
+	_setupDataConnection: function (conn) {
+		var _self = this;
+		conn.on('data', function (data) {
+			_self._onRTC(data);
+		});
 
-			conn.on('close', function () {
-				console.log('dataConnection close')
-				viewer.setActive(conn.metadata.viewerId, false);
-				conn.close();
-				delete _self.connectionList[conn.metadata.viewerId];
-			});
+		conn.on('open', function (e) {
+			editorList.get(getMyViewerId()).send();
+			viewer.setActive(conn.metadata.viewerId, true);
+		});
+
+		conn.on('close', function () {
+			viewer.setActive(conn.metadata.viewerId, false);
+			delete _self._connectionList[conn.metadata.viewerId];
 		});
 	},
 
@@ -117,31 +124,13 @@ Connection.prototype = {
 	onOffer: function (peerId) {
 		console.log('onOffer', peerId);
 
-		var _self = this;
-		var conn = this.myPeer.connect(peerId, {
+		var conn = this.peer.connect(peerId, {
 			reliable: true,
 			metadata: {
 				viewerId: getMyViewerId()
 			}
 		});
-
-		conn.on('data', function (data) {
-			_self.onRTC(data);
-		});
-
-		// 現在のデータを入室者におくる
-		conn.on('open', function (e) {
-			// TODO: 本人に送れば十分だが、既存の機能で全員に送っているのであとで直す
-			editorList.get(getMyViewerId()).send();
-			viewer.setActive(conn.metadata.viewerId, true);
-		});
-
-		conn.on('close', function () {
-			console.log('dataConnection close ---');
-			viewer.setActive(conn.metadata.viewerId, false);
-			conn.close();
-			delete _self.connectionList[conn.metadata.viewerId];
-		});
+		this._setupDataConnection(conn);
 	},
 
 
@@ -149,7 +138,7 @@ Connection.prototype = {
 	 * Peerからデータを受信
 	 * @param  {Object} data
 	 */
-	onRTC: function (data) {
+	_onRTC: function (data) {
 		dataUpdate(data);
 	},
 
@@ -159,8 +148,8 @@ Connection.prototype = {
 	 * @param  {Object} data
 	 */
 	sendRTC: function (data) {
-		for (var viewerId in this.connectionList) {
-			this.connectionList[viewerId].send(data);
+		for (var viewerId in this._connectionList) {
+			this._connectionList[viewerId].send(data);
 		}
 	},
 

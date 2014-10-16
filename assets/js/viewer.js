@@ -3,12 +3,11 @@
  * @param {EditorList} editorList
  */
 var Viewer = function (editorList) {
-	var $templates = $('#ko-cha-templates');
 	/**
 	 * アイコンのHTMLテンプレート
 	 * @type {jQuery Object}
 	 */
-	this.$icon = $templates.find('.viewer-icon').clone();
+	this.$icon = $('#ko-cha-templates').find('.viewer-icon').clone();
 
 
 	/**
@@ -28,20 +27,21 @@ Viewer.prototype = {
 	/**
 	 * 初期化
 	 */
-	init: function () {
-		$('.js_my_icon').addClass(roomInfo.viewer.viewer_id).css({
+	init: function (selfViewerId) {
+		// アイコン画像を適用
+		$('.js_my_icon').addClass(selfViewerId).css({
 			'background-image': 'url(' + this.getIconUrl(roomInfo.viewer.image) + ')'
 		});
-		// 自分自身をビューワーリストに追加して、自分のエディタを全画面で表示する
+
+		// 自分自身をリストに追加して、自分のエディタを全画面で表示する
 		this.add(roomInfo.viewer);
 		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
-		this.editorList.setLayout(roomInfo.viewer.viewer_id, 4);
+		this.editorList.setLayout(selfViewerId, 4);
 
 		// SNSログイン
 		$('.sns-login').find('span').click(function () {
 			var sns = $(this).data('sns');
-			var url = 'auth/login/' + sns;
-			window.open(url, '', 'width=800,height=500');
+			window.open('auth/login/' + sns, '', 'width=800,height=500');
 		});
 	},
 
@@ -52,15 +52,11 @@ Viewer.prototype = {
 	 */
 	update: function (data) {
 		for (var i in data) {
-			if (data[i].viewer_id in this.editorList.editorList) {
-				var image = this.getIconUrl(data[i].image);
-				this.changeIcon(image, data[i].viewer_id);
-
-				$('.viewer-list').find('[data-viewer-id="' + data[i].viewer_id + '"]').addClass(data[i].viewer_id).css('background-image', 'url(' + image + ')');
-				$('#' + data[i].viewer_id).find('.editor-user-icon').css('background-image', 'url(' + image + ')').addClass(data[i].viewer_id);
-			} else {
+			if (!(data[i].viewer_id in this.viewerInfoList)) {
 				this.add(data[i]);
 			}
+
+			this.changeIcon(this.getIconUrl(data[i].image), data[i].viewer_id);
 
 			// PeerConnectionのオファーが来た
 			if (data[i].peer_id &&　data[i].viewing == '1' && data[i].viewer_id !== getMyViewerId()) {
@@ -77,16 +73,15 @@ Viewer.prototype = {
 	add: function (data) {
 		this.viewerInfoList[data.viewer_id] = data;
 		this.editorList.add(data.viewer_id);
-		var image = this.getIconUrl(data.image);
 
-		this.$icon.clone().attr('data-viewer-id', data.viewer_id).addClass(data.viewer_id).css('background-image', 'url(' + image + ')').appendTo(".viewer-list");
-		$('#' + data.viewer_id).find('.editor-user-icon').css('background-image', 'url(' + image + ')').addClass(data.viewer_id).mouseenter(function () {
+		this.$icon.clone().attr('data-viewer-id', data.viewer_id).addClass(data.viewer_id).appendTo(".viewer-list");
+		$('#' + data.viewer_id).find('.editor-user-icon').addClass(data.viewer_id).mouseenter(function () {
 			$(this).addClass('hidden');
 			var that = this;
 			setTimeout(function() {$(that).removeClass('hidden') }, 2000);
 		});
 
-		if (roomInfo.viewer.viewer_id === data.viewer_id) {
+		if (getMyViewerId() === data.viewer_id) {
 			$('#' + data.viewer_id).addClass('self-editor');
 		}
 	},
@@ -112,28 +107,26 @@ Viewer.prototype = {
 
 	/**
 	 * ユーザーアイコンのHTML生成
-	 * @param  {Object} data
+	 * @param  {String} fileName
 	 * @return {String} HTML
 	 */
-	getIconUrl: function (data) {
-		data = "" + data;
-		return data.length < 10 ? 'assets/img/user/default/' + data + '.png' : data;
+	getIconUrl: function (fileName) {
+		fileName = "" + fileName;
+		return fileName.length < 10 ? 'assets/img/user/default/' + fileName + '.png' : fileName;
 	},
 
 
 	/**
 	 * ユーザーアイコンを変更する
-	 * @param  {String} image - 新しいアイコンのURL
+	 * @param  {String} imageUrl - 新しいアイコンのURL
 	 * @param  {String} viewerId
 	 */
-	changeIcon: function (image, viewerId) {
-		if (viewerId === roomInfo.viewer.viewer_id) {
-			roomInfo.viewer.image = image;
+	changeIcon: function (imageUrl, viewerId) {
+		if (viewerId === getMyViewerId()) {
+			roomInfo.viewer.image = imageUrl;
 		}
-		if (this.viewerInfoList[viewerId] !== image) {
-			this.viewerInfoList[viewerId].image = image;
-			$('.' + viewerId).css('background-image', 'url(' + image + ')');
-		}
+		this.viewerInfoList[viewerId].image = imageUrl;
+		$('#' + viewerId + ' .editor-user-icon, .' + viewerId).css('background-image', 'url(' + imageUrl + ')');
 	}
 }
 
