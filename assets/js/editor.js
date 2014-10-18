@@ -234,22 +234,6 @@ Editor.prototype = {
 		}).send({
 			mode: 'c_cpp'
 		});
-		return;
-
-/*
-		var tabId = 'untitled', index = '';
-		
-		// 同じタブ名がある間 index を更新する
-		while ((tabId + index) in this.tabList) {
-			index++;
-		}
-		// タブ追加＆言語設定
-		this.addTab(tabId + index).applyData({
-			mode: 'c_cpp'
-		}).send({
-			mode: 'c_cpp'
-		});
-*/
 	},
 
 

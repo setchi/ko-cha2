@@ -1,8 +1,8 @@
 /**
  * Viewerごとのタブの管理
- * @param {[type]} viewerId
- * @param {[type]} tabId
- * @param {[type]} tabName
+ * @param {String} viewerId
+ * @param {String} tabId
+ * @param {String} tabName
  */
 var Tab = function (viewerId, tabId, tabName) {
 	/**
@@ -216,10 +216,10 @@ Tab.prototype = {
 
 		/**
 		 * データを送信する
-		 * @param  {[type]} type - 送信タイプ
-		 * @param  {[type]} data
-		 * @param  {[type]} toServer - サーバに送信するならtrue
-		 * @param  {[type]} command
+		 * @param  {String} type - 送信タイプ
+		 * @param  {Object} data
+		 * @param  {Boolean} toServer - サーバに送信するならtrue
+		 * @param  {String} command
 		 */
 		this._sendData = function (type, data, toServer, command) {
 			// TODO: この中をもっと整える
