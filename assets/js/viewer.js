@@ -28,15 +28,13 @@ Viewer.prototype = {
 	 * 初期化
 	 */
 	init: function (selfViewerId) {
-		// アイコン画像を適用
+		// 自身のアイコン画像を適用
 		$('.js_my_icon').addClass(selfViewerId).css({
 			'background-image': 'url(' + this.getIconUrl(roomInfo.viewer.image) + ')'
 		});
 
-		// 自分自身をリストに追加して、自分のエディタを全画面で表示する
 		this.add(roomInfo.viewer);
 		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
-		this.editorList.setLayout(selfViewerId, 4);
 
 		// SNSログイン
 		$('.sns-login').find('span').click(function () {

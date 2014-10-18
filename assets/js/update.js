@@ -4,7 +4,7 @@
  */
 var command = {
 	removeTab: function (editorData) {
-		editorList.get(editorData.viewerId).removeTab(editorData.tabName);
+		editorList.get(editorData.viewerId).removeTab(editorData.tabId);
 	}
 }
 

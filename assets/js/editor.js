@@ -26,14 +26,14 @@ var Editor = function (viewerId, state) {
 	 * 現在編集しているタブの名前
 	 * @type {String}
 	 */
-	this.currentTabName = "";
+	this.currentTabId = "";
 
 
 	/**
 	 * このエディタのHTMLルート
 	 * @type {Object}
 	 */
-	this.$root = $(document.getElementById(this.viewerId));
+	this.$root = $('#' + this.viewerId);
 
 
 	/**
@@ -55,14 +55,14 @@ var Editor = function (viewerId, state) {
 	 * サイドバーのHTMLルート。リサイズ時にサイズを取得するためキャッシュ。
 	 * @type {Object}
 	 */
-	this.$sidebar = $(document.getElementsByClassName('sidebar'));
+	this.$sidebar = $('.sidebar');
 
 
 	/**
 	 * エディタ全体を表示しているHTMLのルート
 	 * @type {Object}
 	 */
-	this.$editorRegion = $(document.getElementById('editor-region'));
+	this.$editorRegion = $('#editor-region');
 
 
 	/**
@@ -174,11 +174,11 @@ Editor.prototype = {
 
 	/**
 	 * タブの位置を変更する(未実装)
-	 * @param {String} tabName
+	 * @param {String} tabId
 	 * @param {Number} state
 	 */
-	setLayout: function (tabName, state) {
-		console.log(tabName, state);
+	setLayout: function (tabId, state) {
+		console.log(tabId, state);
 	},
 
 
@@ -193,14 +193,15 @@ Editor.prototype = {
 
 	/**
 	 * タブのインスタンスを取得する。存在しない場合は新しく追加する
+	 * @param  {String} tabId
 	 * @param  {String} tabName
 	 * @return {Tab} Tabのインスタンス
 	 */
-	get: function (tabName) {
-		if (void 0 === this.tabList[tabName]) {
-			this.addTab(tabName);
+	get: function (tabId, tabName) {
+		if (void 0 === this.tabList[tabId]) {
+			return this.addTab(tabName);
 		}
-		return this.tabList[tabName];
+		return this.tabList[tabId];
 	},
 
 
@@ -209,17 +210,16 @@ Editor.prototype = {
 	 * @param {String} tabName
 	 */
 	addTab: function (tabName) {
-		if (tabName in this.tabList) {
-			console.warn('タブ名が重複しています.');
-			return this.tabList[tabName];
-		}
+		var tabId = 0;
+		while (tabId in this.tabList) tabId++;
+
 		// エディタ生成
-		this.tabList[tabName] = new Tab(this.viewerId, tabName).hide();
+		this.tabList[tabId] = new Tab(this.viewerId, tabId, tabName).hide();
 		if (getSize(this.tabList) === 1) {
-			this.changeActiveTab(tabName);
+			this.changeActiveTab(tabId);
 		}
 		this.tabResize();
-		return this.tabList[tabName];
+		return this.tabList[tabId];
 	},
 
 
@@ -227,18 +227,29 @@ Editor.prototype = {
 	 * 空タブを生成する
 	 */
 	addEmptyTab: function () {
-		var tabName = 'untitled', index = '';
-		
-		// 同じタブ名がある間 index を更新する
-		while ((tabName + index) in this.tabList) {
-			index++;
-		}
-		// タブ追加＆言語設定
-		this.addTab(tabName + index).applyData({
+		var  tabId = this.tabList.length;
+
+		this.addTab('untitled').applyData({
 			mode: 'c_cpp'
 		}).send({
 			mode: 'c_cpp'
 		});
+		return;
+
+/*
+		var tabId = 'untitled', index = '';
+		
+		// 同じタブ名がある間 index を更新する
+		while ((tabId + index) in this.tabList) {
+			index++;
+		}
+		// タブ追加＆言語設定
+		this.addTab(tabId + index).applyData({
+			mode: 'c_cpp'
+		}).send({
+			mode: 'c_cpp'
+		});
+*/
 	},
 
 
@@ -260,22 +271,22 @@ Editor.prototype = {
 
 	/**
 	 * タブ削除。左右にタブがあれば次のタブを表示する（左側優先）
-	 * @param  {String} tabName
+	 * @param  {String} tabId
 	 */
-	removeTab: function (tabName) {
-		if (void 0 === this.tabList[tabName]) return;
+	removeTab: function (tabId) {
+		if (void 0 === this.tabList[tabId]) return;
 
-		var target = this.$root.find('.tab-list').find('li[data-tab-name="' + tabName + '"]');
+		var target = this.$root.find('.tab-list').find('li[data-tab-id="' + tabId + '"]');
 		var prev = target.prev().eq(0);
 		var next = target.next().eq(0);
 		var nextViewing = prev.size() ? prev : next.size() ? next : false;
 
-		this.tabList[tabName].remove();
-		delete this.tabList[tabName];
+		this.tabList[tabId].remove();
+		delete this.tabList[tabId];
 
-		this.$root.find('[data-tab-name="' + tabName + '"]').remove();
-		if (this.currentTabName == tabName && nextViewing !== false) {
-			this.changeActiveTab(nextViewing.data('tab-name'));
+		this.$root.find('[data-tab-id="' + tabId + '"]').remove();
+		if (this.currentTabId == tabId && nextViewing !== false) {
+			this.changeActiveTab(nextViewing.data('tab-id'));
 		}
 	},
 
@@ -334,24 +345,24 @@ Editor.prototype = {
 
 	/**
 	 * タブを切り替える
-	 * @param  {String} tabName
+	 * @param  {String} tabId
 	 * @return {Tab} 切り替えたタブのインスタンス
 	 */
-	changeActiveTab: function (tabName) {
-		if (!(tabName in this.tabList)) {
-			console.warn("changeActiveTab 指定されたタブが存在しません: " + tabName);
+	changeActiveTab: function (tabId) {
+		if (!(tabId in this.tabList)) {
+			console.warn("changeActiveTab 指定されたタブが存在しません: " + tabId);
 			return;
 		}
-		var $target = $(document.getElementById(this.viewerId));
-		$target.find('.tab-item').removeClass('active').filter('[data-tab-name="' + tabName + '"]').addClass('active').removeClass('reception');
+		var $target = $('#' + this.viewerId);
+		$target.find('.tab-item').removeClass('active').filter('[data-tab-id="' + tabId + '"]').addClass('active').removeClass('reception');
 
 		for (var name in this.tabList) {
 			this.tabList[name].hide();
 		}
-		this.tabList[tabName].show().resize();
-		this.currentTabName = tabName;
+		this.tabList[tabId].show().resize();
+		this.currentTabId = tabId;
 		$(window).resize();
-		return this.tabList[tabName];
+		return this.tabList[tabId];
 	},
 
 
@@ -370,9 +381,9 @@ Editor.prototype = {
 	 * @return {Editor} 自身のインスタンス
 	 */
 	send: function (saveToServer) {
-		for (var tabName in this.tabList) {
+		for (var tabId in this.tabList) {
 			console.log('sendRTC');
-			var tab = this.tabList[tabName];
+			var tab = this.tabList[tabId];
 
 			tab[saveToServer ? 'saveToServer' : 'send']({ text: tab.getText() });
 		}

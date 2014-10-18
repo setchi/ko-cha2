@@ -5,7 +5,7 @@ class Model_Editor extends Model
 	public static function get_data($table, $room_id, $viewer_id, $last_time) {
 		$query = DB::select(
 			'viewer_id',
-			'tab_name',
+			'tab_id',
 			'data',
 			DB::expr('MAX(time) as time')
 		)->from($table)
@@ -20,7 +20,7 @@ class Model_Editor extends Model
 		$query = $query->group_by(
 			'room_id',
 			'viewer_id',
-			'tab_name'
+			'tab_id'
 		)->order_by('time')->execute()->as_array();
 
 		if (0 === count($query)) {
@@ -36,14 +36,14 @@ class Model_Editor extends Model
 			DB::delete('editor_change_text')
 				->where('room_id', $room_id)
 				->and_where('viewer_id', $viewer_id)
-				->and_where('tab_name', $data_obj->tabName)
+				->and_where('tab_id', $data_obj->tabId)
 				->execute();
 		}
 
 		$prev_data = DB::select('room_id')->from($table)
 			->where('room_id', $room_id)
 			->and_where('viewer_id', $viewer_id)
-			->and_where('tab_name', $data_obj->tabName)
+			->and_where('tab_id', $data_obj->tabId)
 			->execute()->as_array();
 
 		// insert
@@ -51,7 +51,7 @@ class Model_Editor extends Model
 			DB::insert($table)->set(array(
 				'room_id' => $room_id,
 				'viewer_id' => $viewer_id,
-				'tab_name' => $data_obj->tabName,
+				'tab_id' => $data_obj->tabId,
 				'data' => $data,
 				'time' => $last_time
 			))->execute();
@@ -63,7 +63,7 @@ class Model_Editor extends Model
 				'time' => $last_time
 			))->where('room_id', $room_id)
 			->and_where('viewer_id', $viewer_id)
-			->and_where('tab_name', $data_obj->tabName)
+			->and_where('tab_id', $data_obj->tabId)
 			->execute();
 		}
 	}

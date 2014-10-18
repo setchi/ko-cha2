@@ -1,21 +1,29 @@
 /**
  * Viewerごとのタブの管理
- * @param {String} viewerId
- * @param {String} tabName
+ * @param {[type]} viewerId
+ * @param {[type]} tabId
+ * @param {[type]} tabName
  */
-var Tab = function (viewerId, tabName) {
+var Tab = function (viewerId, tabId, tabName) {
 	/**
-	 * エディタのID
+	 * AceのインスタンスID
 	 * @type {String}
 	 */
-	this.editorId = viewerId + '-' + tabName;
+	this._aceId = viewerId + '-' + tabId;
 
 
 	/**
 	 * このタブのviewerId
 	 * @type {String}
 	 */
-	this.viewerId = viewerId;
+	this._viewerId = viewerId;
+
+
+	/**
+	 * タブID
+	 * @type {String}
+	 */
+	this._tabId = tabId;
 
 
 	/**
@@ -35,35 +43,35 @@ var Tab = function (viewerId, tabName) {
 	/**
 	 * タブHTML要素の初期化
 	 */
-	this._initTabElement(viewerId, tabName);
+	this._initTabElement(viewerId, tabId, tabName);
 
 
 	/**
 	 * エディタのルートHTML要素
 	 * @type {Object}
 	 */
-	this.$editor = $(document.getElementById(this.editorId));
+	this._$editor = $('#' + this._aceId);
 
 
 	/**
 	 * Aceのインスタンス
 	 * @type {Object}
 	 */
-	this.editor = ace.edit(this.editorId);
+	this.ace = ace.edit(this._aceId);
 
 
 	/**
 	 * ファイルの更新日時監視タイマー
 	 * @type {Number}
 	 */
-	this.fileMoniterTimer = null;
+	this._fileMonitorTimer = null;
 
 
 	/**
 	 * ファイルの最終更新日時
 	 * @type {Number}
 	 */
-	this.fileLastMod = -1;
+	this._fileLastMod = -1;
 
 
 	var _self = this;
@@ -71,13 +79,13 @@ var Tab = function (viewerId, tabName) {
 	 * 受信データ反映時の処理マッピング
 	 * @type {Object}
 	 */
-	this.update = {
+	this._update = {
 		/**
 		 * 選択範囲
 		 * @param  {Range} range
 		 */
 		range: function (range) {
-			_self.editor.selection.setSelectionRange(range);
+			_self.ace.selection.setSelectionRange(range);
 		},
 
 
@@ -86,8 +94,8 @@ var Tab = function (viewerId, tabName) {
 		 * @param  {Object} scroll
 		 */
 		scroll: function (scroll) {
-			_self.editor.session.setScrollTop(scroll.top);
-			_self.editor.session.setScrollLeft(scroll.left);
+			_self.ace.session.setScrollTop(scroll.top);
+			_self.ace.session.setScrollLeft(scroll.left);
 		},
 
 
@@ -119,19 +127,30 @@ var Tab = function (viewerId, tabName) {
 
 
 		/**
+		 * タブ名
+		 * @param  {String} tabName
+		 */
+		tabname: function (tabName) {
+			_self.tabName = tabName;
+			var $tabLabel = $('#' + _self._viewerId).find('.tab-list').find('[data-tab-id="' + _self._tabId + '"] > .label');
+			$tabLabel.text(decodeURIComponent(tabName));
+		},
+
+
+		/**
 		 * テキスト
 		 * @param  {String} text
 		 */
 		text: function (text) {
-			var range = _self.editor.session.selection.getRange();
-			var scrollTop = _self.editor.session.getScrollTop();
-			var scrollLeft = _self.editor.session.getScrollLeft();
+			var range = _self.ace.session.selection.getRange();
+			var scrollTop = _self.ace.session.getScrollTop();
+			var scrollLeft = _self.ace.session.getScrollLeft();
 
-			_self.editor.setValue(decodeURIComponent(text));
+			_self.ace.setValue(decodeURIComponent(text));
 
-			_self.editor.selection.setSelectionRange(range);
-			_self.editor.session.setScrollTop(scrollTop);
-			_self.editor.session.setScrollLeft(scrollLeft);
+			_self.ace.selection.setSelectionRange(range);
+			_self.ace.session.setScrollTop(scrollTop);
+			_self.ace.session.setScrollLeft(scrollLeft);
 		},
 
 
@@ -140,9 +159,9 @@ var Tab = function (viewerId, tabName) {
 		 * @param  {Object} cursor
 		 */
 		cursor: function (cursor) {
-			var current = _self.editor.getCursorPosition();
+			var current = _self.ace.getCursorPosition();
 			if (cursor.top !== current.top || cursor.left !== current.left) {
-				_self.editor.moveCursorToPosition(cursor);
+				_self.ace.moveCursorToPosition(cursor);
 			}
 		}
 	}
@@ -157,16 +176,17 @@ Tab.prototype = {
 	/**
 	 * タブのHTML要素初期化
 	 * @param  {String} viewerId
+	 * @param  {String} tabId
 	 * @param  {String} tabName
 	 */
-	_initTabElement: function (viewerId, tabName) {
-		var $root = $(document.getElementById(viewerId));
-		var editorRegion = $(document.getElementById('editor-region'));
-		var tabItemText = '<li class="tab-item" data-tab-name="%s"><a class="label" title="">%s</a><a class="close" data-tab-name="%s">x</a></li>';
-		var editorText = '<div id="%s" data-tab-name="%s"></div>';
+	_initTabElement: function (viewerId, tabId, tabName) {
+		var $root = $('#' + viewerId);
+		var editorRegion = $('#editor-region');
+		var tabItemText = '<li class="tab-item" data-tab-id="%s"><a class="label" title="">%s</a><a class="close" data-tab-id="%s">x</a></li>';
+		var editorText = '<div id="%s" data-tab-id="%s"></div>';
 		// data属性がうまく反映されず、テンプレート化いったん断念
-		$(sprintf(editorText, this.editorId, tabName)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
-		$(sprintf(tabItemText, tabName, tabName, tabName)).appendTo($root.find('.tab-list'));
+		$(sprintf(editorText, this._aceId, tabId)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
+		$(sprintf(tabItemText, tabId, tabName, tabId)).appendTo($root.find('.tab-list'));
 	},
 
 
@@ -174,16 +194,16 @@ Tab.prototype = {
 	 * 初期化
 	 */
 	_init: function () {		
-		this.editor.session.setUseSoftTabs(true);
-		this.editor.setAnimatedScroll(true);
+		this.ace.session.setUseSoftTabs(true);
+		this.ace.setAnimatedScroll(true);
 		this.setTheme('cobalt');
 		this.setMode('c_cpp');
-		this.editor.setFontSize(12);
+		this.ace.setFontSize(12);
 
 		if (this.isSelf) {
 			this._initSelf();
 		} else {
-			this.editor.setReadOnly(true);
+			this.ace.setReadOnly(true);
 		}
 	},
 
@@ -196,19 +216,27 @@ Tab.prototype = {
 
 		/**
 		 * データを送信する
-		 * @param  {String} type - 送信タイプ
-		 * @param  {Object} data
-		 * @param  {Boolean} toServer - サーバに送信するならtrue
+		 * @param  {[type]} type - 送信タイプ
+		 * @param  {[type]} data
+		 * @param  {[type]} toServer - サーバに送信するならtrue
+		 * @param  {[type]} command
 		 */
-		this._sendData = function (type, data, toServer) {
+		this._sendData = function (type, data, toServer, command) {
 			// TODO: この中をもっと整える
+			var tmpData = {
+				viewerId: _self._viewerId,
+				tabId: _self._tabId,
+				tabName: encodeURIComponent(_self.tabName),
+				data: data
+			};
+
+			if (command) {
+				tmpData.command = command;
+			}
+
 			var editorData = {
 				type: 'editor_change_' + type,
-				data: JSON.stringify({
-					viewerId: _self.viewerId,
-					tabName: encodeURIComponent(_self.tabName),
-					data: data
-				})
+				data: JSON.stringify(tmpData)
 			};
 
 			if (toServer) {
@@ -233,22 +261,22 @@ Tab.prototype = {
 			'removeLines'
 		];
 		// イベント登録
-		_self.editor.session.on('change', function (e) {
+		_self.ace.session.on('change', function (e) {
 			if (sendActionList.indexOf(e.data.action) == -1) {
 				return;
 			}
 			_self._sendData('text', { text: _self.getText() });
 		});
-		_self.editor.session.on('changeScrollLeft', function () {
+		_self.ace.session.on('changeScrollLeft', function () {
 			_self._sendData('state', _self.getState());
 		});
-		_self.editor.session.on('changeScrollTop', function () {
+		_self.ace.session.on('changeScrollTop', function () {
 			_self._sendData('state', _self.getState());
 		});
-		_self.editor.session.selection.on('changeSelection', function () {
+		_self.ace.session.selection.on('changeSelection', function () {
 			_self._sendData('state', _self.getState());
 		});
-		_self.editor.session.selection.on('changeCursor', function () {
+		_self.ace.session.selection.on('changeCursor', function () {
 			_self._sendData('state', _self.getState());
 		});
 	},
@@ -284,11 +312,11 @@ Tab.prototype = {
 	 */
 	startMonitoringFile: function (file, arrayBufferToString) {
 		var _self = this;
-		this.fileLastMod = file.lastModifiedDate;
+		this._fileLastMod = file.lastModifiedDate;
 
 		function applyIfUpdated() {
-			if (_self.fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
-				_self.fileLastMod = file.lastModifiedDate;
+			if (_self._fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
+				_self._fileLastMod = file.lastModifiedDate;
 				var reader = new FileReader();
 				reader.onload = function (e) {
 					_self.applyData({
@@ -299,8 +327,8 @@ Tab.prototype = {
 			}
 		}
 
-		clearInterval(this.fileMoniterTimer);
-		this.fileMoniterTimer = setInterval(applyIfUpdated, 1000);
+		clearInterval(this._fileMonitorTimer);
+		this._fileMonitorTimer = setInterval(applyIfUpdated, 1000);
 		return this;
 	},
 
@@ -310,7 +338,7 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	show: function () {
-		this.$editor.removeClass('hidden');
+		this._$editor.removeClass('hidden');
 		return this;
 	},
 
@@ -320,7 +348,7 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	hide: function () {
-		this.$editor.addClass('hidden');
+		this._$editor.addClass('hidden');
 		return this;
 	},
 
@@ -332,7 +360,7 @@ Tab.prototype = {
 	 */
 	setTheme: function (theme) {
 		theme = "ace/theme/" + theme;
-		this.editor.setTheme( theme );
+		this.ace.setTheme( theme );
 		return this;
 	},
 
@@ -344,7 +372,7 @@ Tab.prototype = {
 	 */
 	setMode: function (mode) {
 		mode = "ace/mode/" + mode;
-		this.editor.session.setMode( mode );
+		this.ace.session.setMode( mode );
 		return this;
 	},
 
@@ -355,7 +383,7 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	setFontSize: function (size) {
-		this.editor.setFontSize(size|0);
+		this.ace.setFontSize(size|0);
 		return this;
 	},
 
@@ -365,7 +393,7 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	resize: function () {
-		this.editor.resize();
+		this.ace.resize();
 		return this;
 	},
 
@@ -375,7 +403,7 @@ Tab.prototype = {
 	 * @return {String} 送信用テキスト
 	 */
 	getText: function () {
-		return encodeURIComponent(this.editor.getValue());
+		return encodeURIComponent(this.ace.getValue());
 	},
 
 
@@ -385,15 +413,16 @@ Tab.prototype = {
 	 */
 	getState: function () {
 		return {
+			tabname: this.tabName,
 			scroll: {
-				top: this.editor.session.getScrollTop(),
-				left: this.editor.session.getScrollLeft()
+				top: this.ace.session.getScrollTop(),
+				left: this.ace.session.getScrollLeft()
 			},
-			cursor: this.editor.getCursorPosition(),
-			range: this.editor.session.selection.getRange(),
-			theme: this.editor.getTheme().substr(10),
-			mode: this.editor.session.getMode().$id.substr(9),
-			fontsize: this.editor.getFontSize()
+			cursor: this.ace.getCursorPosition(),
+			range: this.ace.session.selection.getRange(),
+			theme: this.ace.getTheme().substr(10),
+			mode: this.ace.session.getMode().$id.substr(9),
+			fontsize: this.ace.getFontSize()
 		};
 	},
 
@@ -406,8 +435,8 @@ Tab.prototype = {
 	applyData: function (data) {
 		// 入ってきたプロパティだけ反映する
 		for (var prop in data) if (data.hasOwnProperty(prop)) {
-			if (prop in this.update) {
-				this.update[prop](data[prop]);
+			if (prop in this._update) {
+				this._update[prop](data[prop]);
 			} else {
 				console.warn('無効なプロパティ: ', data);
 			}
@@ -421,18 +450,11 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	remove: function () {
-		clearInterval(this.fileMoniterTimer);
-		this.editor.destroy();
+		clearInterval(this._fileMonitorTimer);
+		this.ace.destroy();
 		
 		if (this.isSelf) {
-			connection.send({
-				type: 'editor_change_state',
-				data: JSON.stringify({
-					viewerId: this.viewerId,
-					tabName: this.tabName,
-					command: 'removeTab'
-				})
-			});
+			this._sendData('state', {}, true, 'removeTab');
 		}
 		return this;
 	}

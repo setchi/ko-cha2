@@ -14,16 +14,18 @@ EditorList.prototype = {
 	 */
 	init: function () {
 		var targetTab = null;
+		this.setLayout(getMyViewerId(), 4);
 
 		// 自身のタブが右クリックされたら設定ウィンドウを表示
 		$(document).on('contextmenu', '.tab-item', function (e) {
 			var viewerId = $(this).parents('.editor-root').attr('id');
-			var tabName = $(this).data('tab-name');
-			targetTab = editorList.get(viewerId).changeActiveTab(tabName);
+			var tabId = $(this).data('tab-id');
+			targetTab = editorList.get(viewerId).changeActiveTab(tabId);
 
 			if (targetTab.isSelf) {
 				var currentState = targetTab.getState();
-
+				// 現在値を代入
+				$('#inputTabName').val(decodeURIComponent(targetTab.tabName));
 				$('#selectMode').val(currentState.mode);
 				$('#selectTheme').val(currentState.theme);
 				$('#selectFontSize').val(currentState.fontsize);
@@ -33,28 +35,31 @@ EditorList.prototype = {
 
 		// 言語変更
 		}).on('change', '#selectMode', function (e) {
-			applyData({ mode:  $(this).val() });
+			var data  = { mode:  $(this).val() };
+			targetTab.applyData(data).send(data).ace.focus();
 
 		// テーマ変更
 		}).on('change', '#selectTheme', function (e) {
-			applyData({ theme: $(this).val() });
+			var data = { theme: $(this).val() };
+			targetTab.applyData(data).send(data).ace.focus();
 
 		// フォントサイズ変更
 		}).on('change', '#selectFontSize', function (e) {
-			applyData({ fontsize: $(this).val() });
-		});
+			var data = { fontsize: $(this).val() };
+			targetTab.applyData(data).send(data).ace.focus();
 
-		// 変更をエディタに適用, 送信, フォーカスを戻す
-		function applyData(data) {
-			targetTab.applyData(data).send(data).editor.focus();
-		}
+		// タブ名変更
+		}).on('keyup', '#inputTabName', function (e) {
+			var data = { tabname: encodeURIComponent($(this).val()) };
+			targetTab.applyData(data).send(data);
+		});
 
 		$.contextMenu({
 			selector: '#' + getMyViewerId() + ' .tab-item',
 			items: {
 				content: {
-					name: '言語設定<select id="selectMode" class="form-control"><option value="abap">ABAP</option><option value="actionscript">ActionScript</option><option value="c_cpp">C++</option><option value="c_cpp">C</option><option value="cobol">COBOL</option><option value="coffee">CoffeeScript</option><option value="csharp">C#</option><option value="css">CSS</option><option value="clojure">Clojure</option><option value="d">D</option><option value="dart">Dart</option><option value="erlang">Erlang</option><option value="forth">Forth</option><option value="golang">Go</option><option value="groovy">Groovy</option><option value="haskell">Haskell</option><option value="haxe">Haxe</option><option value="java">Java</option><option value="javascript">JavaScript</option><option value="jsx">JSX</option><option value="lisp">Lisp</option><option value="lsl">LSL</option><option value="lua">Lua</option><option value="matlab">MATLAB</option><option value="mysql">MySQL</option><option value="objectivec">Objective-C</option><option value="markdown">Markdown</option><option value="ocaml">OCaml</option><option value="pascal">Pascal</option><option value="perl">Perl</option><option value="php">PHP</option><option value="plain_text">Plain Text</option><option value="prolog">Prolog</option><option value="python">Python</option><option value="r">R</option><option value="ruby">Ruby</option><option value="rust">Rust</option><option value="scala">Scala</option><option value="scheme">Scheme</option><option value="sh">ShellScript</option><option value="latex">LaTeX</option><option value="typescript">TypeScript</option><option value="vbscript">VBScript</option><option value="verilog">Verilog</option><option value="assembly_x86">Assembly x86</option><option value="xml">XML</option><option value="xquery">XQuery</option></select>テーマ<select id="selectTheme" class="form-control"><optgroup label="Bright"><option value="chrome">Chrome</option><option value="clouds">Clouds</option><option value="crimson_editor">Crimson Editor</option><option value="dawn">Dawn</option><option value="dreamweaver">Dreamweaver</option><option value="eclipse">Eclipse</option><option value="github">GitHub</option><option value="solarized_light">Solarized Light</option><option value="textmate">TextMate</option><option value="tomorrow">Tomorrow</option><option value="xcode">XCode</option><option value="kuroir">Kuroir</option><option value="katzenmilch">KatzenMilch</option></optgroup><optgroup label="Dark"><option value="ambiance">Ambiance</option><option value="chaos">Chaos</option><option value="clouds_midnight">Clouds Midnight</option><option value="cobalt">Cobalt</option><option value="idle_fingers">idle Fingers</option><option value="kr_theme">krTheme</option><option value="merbivore">Merbivore</option><option value="merbivore_soft">Merbivore Soft</option><option value="mono_industrial">Mono Industrial</option><option value="monokai">Monokai</option><option value="pastel_on_dark">Pastel on dark</option><option value="solarized_dark">Solarized Dark</option><option value="terminal">Terminal</option><option value="tomorrow_night">Tomorrow Night</option><option value="tomorrow_night_blue">Tomorrow Night Blue</option><option value="tomorrow_night_bright">Tomorrow Night Bright</option><option value="tomorrow_night_eighties">Tomorrow Night 80s</option><option value="twilight">Twilight</option><option value="vibrant_ink">Vibrant Ink</option></optgroup></select>フォントサイズ<select id="selectFontSize" class="form-control"><option value="10">10px</option><option value="11">11px</option><option value="12" selected="selected">12px</option><option value="13">13px</option><option value="14">14px</option><option value="16">16px</option><option value="18">18px</option><option value="20">20px</option><option value="24">24px</option></select>',
-					callback: function(e){
+					name: 'タブ名<input id="inputTabName" class="form-control" placeholder="タブ名を入力">言語モード<select id="selectMode" class="form-control">  <option value="abap">ABAP</option>  <option value="actionscript">ActionScript</option>  <option value="c_cpp">C++</option>  <option value="c_cpp">C</option>  <option value="cobol">COBOL</option>  <option value="coffee">CoffeeScript</option>  <option value="csharp">C#</option>  <option value="css">CSS</option>  <option value="clojure">Clojure</option>  <option value="d">D</option>  <option value="dart">Dart</option>  <option value="erlang">Erlang</option>  <option value="forth">Forth</option>  <option value="golang">Go</option>  <option value="groovy">Groovy</option>  <option value="haskell">Haskell</option>  <option value="haxe">Haxe</option>  <option value="java">Java</option>  <option value="javascript">JavaScript</option>  <option value="jsx">JSX</option>  <option value="lisp">Lisp</option>  <option value="lsl">LSL</option>  <option value="lua">Lua</option>  <option value="matlab">MATLAB</option>  <option value="mysql">MySQL</option>  <option value="objectivec">Objective-C</option>  <option value="markdown">Markdown</option>  <option value="ocaml">OCaml</option>  <option value="pascal">Pascal</option>  <option value="perl">Perl</option>  <option value="php">PHP</option>  <option value="plain_text">Plain Text</option>  <option value="prolog">Prolog</option>  <option value="python">Python</option>  <option value="r">R</option>  <option value="ruby">Ruby</option>  <option value="rust">Rust</option>  <option value="scala">Scala</option>  <option value="scheme">Scheme</option>  <option value="sh">ShellScript</option>  <option value="latex">LaTeX</option>  <option value="typescript">TypeScript</option>  <option value="vbscript">VBScript</option>  <option value="verilog">Verilog</option>  <option value="assembly_x86">Assembly x86</option>  <option value="xml">XML</option>  <option value="xquery">XQuery</option></select>テーマ<select id="selectTheme" class="form-control">  <optgroup label="Bright">    <option value="chrome">Chrome</option>    <option value="clouds">Clouds</option>    <option value="crimson_editor">Crimson Editor</option>    <option value="dawn">Dawn</option>    <option value="dreamweaver">Dreamweaver</option>    <option value="eclipse">Eclipse</option>    <option value="github">GitHub</option>    <option value="solarized_light">Solarized Light</option>    <option value="textmate">TextMate</option>    <option value="tomorrow">Tomorrow</option>    <option value="xcode">XCode</option>    <option value="kuroir">Kuroir</option>    <option value="katzenmilch">KatzenMilch</option>  </optgroup>  <optgroup label="Dark">    <option value="ambiance">Ambiance</option>    <option value="chaos">Chaos</option>    <option value="clouds_midnight">Clouds Midnight</option>    <option value="cobalt">Cobalt</option>    <option value="idle_fingers">idle Fingers</option>    <option value="kr_theme">krTheme</option>    <option value="merbivore">Merbivore</option>    <option value="merbivore_soft">Merbivore Soft</option>    <option value="mono_industrial">Mono Industrial</option>    <option value="monokai">Monokai</option>    <option value="pastel_on_dark">Pastel on dark</option>    <option value="solarized_dark">Solarized Dark</option>    <option value="terminal">Terminal</option>    <option value="tomorrow_night">Tomorrow Night</option>    <option value="tomorrow_night_blue">Tomorrow Night Blue</option>    <option value="tomorrow_night_bright">Tomorrow Night Bright</option>    <option value="tomorrow_night_eighties">Tomorrow Night 80s</option>    <option value="twilight">Twilight</option>    <option value="vibrant_ink">Vibrant Ink</option>  </optgroup></select>フォントサイズ<select id="selectFontSize" class="form-control">  <option value="10">10px</option>  <option value="11">11px</option>  <option value="12" selected="selected">12px</option>  <option value="13">13px</option>  <option value="14">14px</option>  <option value="16">16px</option>  <option value="18">18px</option>  <option value="20">20px</option>  <option value="24">24px</option></select>',
+					callback: function () {
 						return false;
 					}
 				}
@@ -119,7 +124,7 @@ EditorList.prototype = {
 	 */
 	update: function (data) {
 		try {
-			this.get(data.viewerId).get(decodeURIComponent(data.tabName)).applyData(data.data);
+			this.get(data.viewerId).get(data.tabId, decodeURIComponent(data.tabName)).applyData(data.data);
 		} catch (e) {
 			console.warn(e.message, e);
 		}
@@ -129,11 +134,11 @@ EditorList.prototype = {
 
 		if (!this.get(data.viewerId).isViewing()) {
 			// 閲覧中じゃないユーザーが更新した
-			$(document.getElementsByClassName('viewer-list')).find('[data-viewer-id="' + data.viewerId + '"]').addClass('reception');
+			$('.viewer-list').find('[data-viewer-id="' + data.viewerId + '"]').addClass('reception');
 		}
-		if (this.get(data.viewerId).currentTabName !== data.tabName) {
+		if (this.get(data.viewerId).currentTabId !== data.tabId) {
 			// 見ていないタブが更新された
-			$(document.getElementById(data.viewerId)).find('[data-tab-name="' + data.tabName + '"]').addClass('reception');
+			$('#' + data.viewerId).find('[data-tab-id="' + data.tabId + '"]').addClass('reception');
 		}
 	},
 

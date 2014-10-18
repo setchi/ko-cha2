@@ -30,10 +30,10 @@ DROP TABLE IF EXISTS `editor_change_state`;
 CREATE TABLE IF NOT EXISTS `editor_change_state` (
   `room_id` varchar(15) collate utf8_unicode_ci NOT NULL default '',
   `viewer_id` varchar(250) collate utf8_unicode_ci NOT NULL default '',
-  `tab_name` varchar(50) collate utf8_unicode_ci NOT NULL default '',
+  `tab_id` varchar(50) collate utf8_unicode_ci NOT NULL default '',
   `data` text collate utf8_unicode_ci,
   `time` double default NULL,
-  PRIMARY KEY  (`room_id`,`viewer_id`,`tab_name`),
+  PRIMARY KEY  (`room_id`,`viewer_id`,`tab_id`),
   KEY `viewer_id` (`viewer_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -45,10 +45,10 @@ DROP TABLE IF EXISTS `editor_change_text`;
 CREATE TABLE IF NOT EXISTS `editor_change_text` (
   `room_id` varchar(15) collate utf8_unicode_ci NOT NULL default '',
   `viewer_id` varchar(250) collate utf8_unicode_ci NOT NULL default '',
-  `tab_name` varchar(50) collate utf8_unicode_ci NOT NULL default '',
+  `tab_id` varchar(50) collate utf8_unicode_ci NOT NULL default '',
   `data` mediumtext collate utf8_unicode_ci,
   `time` double default NULL,
-  PRIMARY KEY  (`room_id`,`viewer_id`,`tab_name`),
+  PRIMARY KEY  (`room_id`,`viewer_id`,`tab_id`),
   KEY `viewer_id` (`viewer_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

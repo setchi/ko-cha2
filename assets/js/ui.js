@@ -141,7 +141,7 @@ var Tab = {
 		this.rootWidth = this.$root.width();
 		this.rootHeight = this.$root.height();
 		this.targetId = this.$root.attr('id');
-		editorList.get(this.targetId).changeActiveTab($(target).data('tab-name'));
+		editorList.get(this.targetId).changeActiveTab($(target).data('tab-id'));
 		this.targetTabWidth = $(target).width();
 	},
 
@@ -152,7 +152,7 @@ var Tab = {
 		this.temporaryTab.remove();
 
 		if (this.frameState !== -1) {
-			editorList.get(this.targetId).setLayout($(this.target).data('tab-name'), this.frameState);
+			editorList.get(this.targetId).setLayout($(this.target).data('tab-id'), this.frameState);
 			this.frameState = -1;
 		}
 		if (this.isInside) {
@@ -421,7 +421,7 @@ $(document).on('mousedown', '.sidebar-handle', function (e) {
 }).on('mousedown', '.tab-item', function (e) {
 	// タブ削除
 	if (isSelf(e) && $(this).find('.close')[0] === e.target) {
-		editorList.get($(this).parents('.editor-root').attr('id')).removeTab($(this).data('tab-name'));
+		editorList.get($(this).parents('.editor-root').attr('id')).removeTab($(this).data('tab-id'));
 	
 	} else {
 		Tab.dragStart(e.pageX, e.pageY, this);
