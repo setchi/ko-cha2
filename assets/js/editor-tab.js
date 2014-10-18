@@ -37,7 +37,7 @@ var Tab = function (viewerId, tabId, tabName) {
 	 * 自身かどうか
 	 * @type {Boolean}
 	 */
-	this.isSelf = viewerId === getMyViewerId();
+	this.isSelf = viewerId === viewer.getSelfId();
 
 
 	/**
@@ -104,7 +104,7 @@ var Tab = function (viewerId, tabId, tabName) {
 		 * @param  {String} mode
 		 */
 		mode: function (mode) {
-			_self.setMode(mode);
+			_self.ace.session.setMode("ace/mode/" + mode);
 		},
 
 
@@ -113,7 +113,7 @@ var Tab = function (viewerId, tabId, tabName) {
 		 * @param  {String} theme
 		 */
 		theme: function (theme) {
-			_self.setTheme(theme);
+			_self.ace.setTheme("ace/theme/" + theme);
 		},
 
 
@@ -122,7 +122,7 @@ var Tab = function (viewerId, tabId, tabName) {
 		 * @param  {Number} size
 		 */
 		fontsize: function (size) {
-			_self.setFontSize(size);
+			_self.ace.setFontSize(size|0);
 		},
 
 
@@ -185,8 +185,8 @@ Tab.prototype = {
 		var tabItemText = '<li class="tab-item" data-tab-id="%s"><a class="label" title="">%s</a><a class="close" data-tab-id="%s">x</a></li>';
 		var editorText = '<div id="%s" data-tab-id="%s"></div>';
 		// data属性がうまく反映されず、テンプレート化いったん断念
-		$(sprintf(editorText, this._aceId, tabId)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
-		$(sprintf(tabItemText, tabId, tabName, tabId)).appendTo($root.find('.tab-list'));
+		$(Utils.sprintf(editorText, this._aceId, tabId)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
+		$(Utils.sprintf(tabItemText, tabId, tabName, tabId)).appendTo($root.find('.tab-list'));
 	},
 
 
@@ -196,9 +196,11 @@ Tab.prototype = {
 	_init: function () {		
 		this.ace.session.setUseSoftTabs(true);
 		this.ace.setAnimatedScroll(true);
-		this.setTheme('cobalt');
-		this.setMode('c_cpp');
-		this.ace.setFontSize(12);
+		this.applyData({
+			theme: 'cobalt',
+			mode: 'c_cpp',
+			fontsize: 12
+		});
 		this.isSelf ? this._initSelf() : this.ace.setReadOnly(true);
 	},
 
@@ -329,41 +331,6 @@ Tab.prototype = {
 	 */
 	hide: function () {
 		this._$editor.addClass('hidden');
-		return this;
-	},
-
-
-	/**
-	 * カラーテーマを変更
-	 * @param {String} theme
-	 * @return {Tab} 自身
-	 */
-	setTheme: function (theme) {
-		theme = "ace/theme/" + theme;
-		this.ace.setTheme( theme );
-		return this;
-	},
-
-
-	/**
-	 * 言語モードを変更
-	 * @param {String} mode
-	 * @return {Tab} 自身
-	 */
-	setMode: function (mode) {
-		mode = "ace/mode/" + mode;
-		this.ace.session.setMode( mode );
-		return this;
-	},
-
-
-	/**
-	 * フォントサイズを変更
-	 * @param {Number} size
-	 * @return {Tab} 自身
-	 */
-	setFontSize: function (size) {
-		this.ace.setFontSize(size|0);
 		return this;
 	},
 

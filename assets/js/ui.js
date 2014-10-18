@@ -6,10 +6,8 @@ $(function () {
 
 /**
  * エディタの移動先を示す半透明フレームの処理
- * @param {Number} r
- * @param {Number} g
- * @param {Number} b
  */
+
 var MarkFrame = function (r, g, b) {
 	this.markFrame = $('<dvi></div>').addClass('mark-frame').css({
 		'background-color': 'rgba(' + r + ', ' + g + ', ' + b + ', 0.05)',
@@ -21,22 +19,10 @@ var MarkFrame = function (r, g, b) {
 	}).appendTo('body');
 }
 MarkFrame.prototype = {
-
-	/**
-	 * 要素を削除
-	 */
 	remove: function () {
 		this.markFrame.remove();
 	},
 
-
-	/**
-	 * 要素の位置・大きさを変更
-	 * @param  {Number} top
-	 * @param  {Number} left
-	 * @param  {Number} width
-	 * @param  {Number} height
-	 */
 	moveTo: function (top, left, width, height) {
 		this.markFrame.css({
 			'top': top,
@@ -50,8 +36,8 @@ MarkFrame.prototype = {
 
 /**
  * サイドバーの横幅を調整するハンドルのドラッグ処理
- * @type {Object}
  */
+
 var SidebarHandle = {
 	dragging: false,
 	startX: 0,
@@ -84,7 +70,7 @@ var SidebarHandle = {
 	dragMoveTo: function (pageX) {
 		if (!this.dragging) return;
 		var movedAmount = pageX - this.startX;
-		var afterWidth = rangeFilter(
+		var afterWidth = Utils.rangeFilter(
 			movedAmount + this.beforeWidth,
 			this.minSidebarWidth,
 			this.windowWidth - 50
@@ -403,7 +389,7 @@ var ViewerIcon = {
 }
 
 function isSelf(e) {
-	return $(e.target).parents('.editor-root').attr('id') === roomInfo.viewer.viewer_id;
+	return $(e.target).parents('.editor-root').attr('id') === viewer.getSelfId();
 }
 
 
@@ -416,7 +402,7 @@ SidebarHandle.setCallback(function () {
 
 $(document).on('mousedown', '.sidebar-handle', function (e) {
 	SidebarHandle.dragStart(e.pageX);
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 
 }).on('mousedown', '.tab-item', function (e) {
 	// タブ削除
@@ -427,23 +413,23 @@ $(document).on('mousedown', '.sidebar-handle', function (e) {
 		Tab.dragStart(e.pageX, e.pageY, this);
 	}
 
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 
 }).on('mousedown', 'header .viewer-icon', function (e) {
 	ViewerIcon.dragStart(e.pageX, e.pageY, this);
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 
 }).on('mouseup', function (e) {
 	SidebarHandle.dragEnd();
 	ViewerIcon.dragEnd(e.pageX, e.pageY);
 	Tab.dragEnd();
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 
 }).on('mousemove', function (e) {
 	SidebarHandle.dragMoveTo(e.pageX);
 	ViewerIcon.dragMoveTo(e.pageX, e.pageY);
 	Tab.dragMoveTo(e.pageX, e.pageY);
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 });
 
 $(window).resize(function () {

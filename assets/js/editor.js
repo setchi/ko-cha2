@@ -69,7 +69,7 @@ var Editor = function (viewerId, state) {
 	 * 自身かどうか
 	 * @type {Boolean}
 	 */
-	this.isSelf = viewerId === getMyViewerId();
+	this.isSelf = viewerId === viewer.getSelfId();
 
 	if (this.isSelf) {
 		this._initSelfEditor();
@@ -99,7 +99,7 @@ Editor.prototype = {
 						timer = -1;
 					}, 400);
 				}
-				return cancelEvent(e);
+				return Utils.cancelEvent(e);
 			}
 		}());
 
@@ -109,7 +109,7 @@ Editor.prototype = {
 
 			if (e.ctrlKey && keyCode === 83) {
 				_self.saveToServer();
-				return cancelEvent(e);
+				return Utils.cancelEvent(e);
 			}
 		});
 	},
@@ -215,7 +215,7 @@ Editor.prototype = {
 
 		// エディタ生成
 		this.tabList[tabId] = new Tab(this.viewerId, tabId, tabName).hide();
-		if (getSize(this.tabList) === 1) {
+		if (Utils.getSize(this.tabList) === 1) {
 			this.changeActiveTab(tabId);
 		}
 		this.tabResize();
@@ -245,7 +245,7 @@ Editor.prototype = {
 		return function () {
 			clearTimeout(timer);
 			timer = setTimeout(function() {
-				var tabWidth = (this.$root.width() - 100) / getSize(this.tabList);
+				var tabWidth = (this.$root.width() - 100) / Utils.getSize(this.tabList);
 				this.$root.find('.tab-item').width(tabWidth).find('.label').width(tabWidth - (tabWidth / 200 * 60) - 10);
 			}.bind(this), 100);
 		}

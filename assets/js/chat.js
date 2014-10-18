@@ -3,14 +3,6 @@
  * @type {Object}
  */
 var Chat = {
-
-	/**
-	 * チャットログを表示する要素
-	 * @type {HTMLElement}
-	 */
-	$log: $('.chat_log'),
-
-
 	/**
 	 * チャットログを保持する
 	 * @type {Array}
@@ -19,24 +11,31 @@ var Chat = {
 
 
 	/**
+	 * チャットログを表示する要素
+	 * @type {HTMLElement}
+	 */
+	_$log: $('.chat_log'),
+
+
+	/**
 	 * URLにマッチさせる正規表現
 	 * @type {RegExp}
 	 */
-	regexURL: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
+	_regexURL: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
 
 
 	/**
 	 * チャットログのHTMLテンプレート
 	 * @type {String}
 	 */
-	logText: '<div class="letter"><span class="viewer-icon %s" style="background-image:url(%s)"></span>%s</div>',
+	_logText: '<div class="letter"><span class="viewer-icon %s" style="background-image:url(%s)"></span>%s</div>',
 
 
 	/**
 	 * リンクのHTMLテンプレート
 	 * @type {String}
 	 */
-	linkText: '<a href="%s" target="_blank">%s</a>',
+	_linkText: '<a href="%s" target="_blank">%s</a>',
 
 
 	init: function () {
@@ -46,7 +45,7 @@ var Chat = {
 		connection.on('received', function (data) {
 			for (var state in data) {
 				if (state !== 'chat_log') continue;
-				_self._insert(data[state])
+				_self._insert(data[state]);
 			}
 		});
 
@@ -68,12 +67,12 @@ var Chat = {
 	 * @param  {Boolean} selfEnter 自身の発言による挿入か
 	 */
 	_insert: function (logs, selfEnter) {
-		var html = '';
+		var html = '', currentHtml = this._$log.html();
 
 		for (var i in logs) {
 			var data = logs[i];
 			// TODO: ついさっきスクリプトから挿入した自分の発言が、サーバーからも送られて来るので無視している。もっと構造を整える。
-			if (!selfEnter && roomInfo.viewer.viewer_id === data.viewer_id) continue;
+			if (!selfEnter && !currentHtml && viewer.getSelfId() === data.viewer_id) continue;
 
 			this.log.push($.extend(true, {}, data));
 			data.message = decodeURIComponent(data.message);
@@ -91,7 +90,7 @@ var Chat = {
 			
 			// 自分の更新でなく、今この画面を見ていなければデスクトップ通知を出す
 			if (roomInfo.viewer.viewer_id !== data.viewer_id) {
-				executeIfNotViewing(function () {
+				Utils.executeIfNotViewing(function () {
 					var myNotification = new Notify('Ko-cha', {
 						icon: viewer.getImageUrl(data.image),
 						body: isImage ? "画像を送信しました。" : data.message
@@ -101,7 +100,7 @@ var Chat = {
 			}
 		}
 
-		this.$log.prepend(html).scrollTop(0);
+		this._$log.prepend(html).scrollTop(0);
 		$('.fancybox').fancybox({
 			autoSize: true
 		});
@@ -114,15 +113,14 @@ var Chat = {
 	 * @return {String} ログHTML
 	 */
 	_genRemarkHTML: function (log) {
-		var that = this;
-		var message = escapeHTML(log.message).replace(this.regexURL, function () {
+		var message = Utils.escapeHTML(log.message).replace(this._regexURL, function () {
 			var url = "";
-			log.message.replace(that.regexURL, function ($1, $2) {
+			log.message.replace(this._regexURL, function ($1, $2) {
 				url = $2;
 			});
-			return sprintf(that.linkText, url, url);
-		});
-		return sprintf(this.logText, log.viewer_id, viewer.getIconUrl(log.image), message);
+			return Utils.sprintf(this._linkText, url, url);
+		}.bind(this));
+		return Utils.sprintf(this._logText, log.viewer_id, viewer.getIconUrl(log.image), message);
 	},
 
 
@@ -140,7 +138,7 @@ var Chat = {
 		var thumbUrl = baseUrl + 'thumb-' + imageName.substr(0, imageName.length-3) + thumbExt;
 
 		var image = '画像を送信しました。<a href="' + imageUrl + '" class="fancybox" title=""><img src="' + thumbUrl + '"></a>';
-		return sprintf(this.logText, log.viewer_id, viewer.getIconUrl(log.image), image);
+		return Utils.sprintf(this._logText, log.viewer_id, viewer.getIconUrl(log.image), image);
 	},
 
 
@@ -157,7 +155,7 @@ var Chat = {
 		connection.sendRTC({
 			updated: true,
 			chat_log: [{
-				viewer_id: getMyViewerId(),
+				viewer_id: viewer.getSelfId(),
 				image: roomInfo.viewer.image,
 				message: encodeURIComponent(message)
 			}]

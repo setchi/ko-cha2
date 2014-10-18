@@ -186,12 +186,12 @@ function handleDroppedFile (e) {
 		}
 
 	}
-	return cancelEvent(e);
+	return Utils.cancelEvent(e);
 }
 
 // イベント登録
-$(document).bind("dragenter", cancelEvent)
-	.bind("dragover", cancelEvent)
+$(document).bind("dragenter", Utils.cancelEvent)
+	.bind("dragover", Utils.cancelEvent)
 	.bind("drop", handleDroppedFile);
 
 });

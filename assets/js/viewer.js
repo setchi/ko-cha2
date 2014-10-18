@@ -1,20 +1,12 @@
 /**
  * Viewerに関する処理
- * @param {EditorList} editorList
  */
-var Viewer = function (editorList) {
+var Viewer = function () {
 	/**
 	 * アイコンのHTMLテンプレート
 	 * @type {jQuery Object}
 	 */
 	this.$icon = $('#ko-cha-templates').find('.viewer-icon').clone();
-
-
-	/**
-	 * EditorListのインスタンス
-	 * @type {EditorList}
-	 */
-	this.editorList = editorList;
 
 
 	/**
@@ -33,7 +25,7 @@ Viewer.prototype = {
 			'background-image': 'url(' + this.getIconUrl(roomInfo.viewer.image) + ')'
 		});
 
-		this.add(roomInfo.viewer);
+		this._add(roomInfo.viewer);
 		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
 
 		// SNSログイン
@@ -44,7 +36,7 @@ Viewer.prototype = {
 
 		// 接続が完了したとき
 		connection.on('open', function (conn) {
-			if (!this.isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
+			if (!this._isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
 				conn.send({ updated: true, chat_log: Chat.log });
 			}
 			this._setActive(conn.metadata.viewerId, true);
@@ -72,13 +64,13 @@ Viewer.prototype = {
 	_update: function (data) {
 		for (var i in data) {
 			if (!(data[i].viewer_id in this.viewerInfoList)) {
-				this.add(data[i]);
+				this._add(data[i]);
 			}
 
-			this.changeIcon(this.getIconUrl(data[i].image), data[i].viewer_id);
+			this._applyIcon(this.getIconUrl(data[i].image), data[i].viewer_id);
 
 			// PeerConnectionのオファーが来た
-			if (data[i].peer_id &&　data[i].viewing == '1' && data[i].viewer_id !== getMyViewerId()) {
+			if (data[i].peer_id && data[i].viewing == '1' && data[i].viewer_id !== this.getSelfId()) {
 				connection.onOffer(data[i].peer_id);
 			}
 		}
@@ -89,9 +81,9 @@ Viewer.prototype = {
 	 * Viewerの追加
 	 * @param {Object} data
 	 */
-	add: function (data) {
+	_add: function (data) {
 		this.viewerInfoList[data.viewer_id] = data;
-		this.editorList.add(data.viewer_id);
+		editorList.add(data.viewer_id);
 
 		this.$icon.clone().attr('data-viewer-id', data.viewer_id).addClass(data.viewer_id).appendTo(".viewer-list");
 		$('#' + data.viewer_id).find('.editor-user-icon').addClass(data.viewer_id).mouseenter(function () {
@@ -100,7 +92,7 @@ Viewer.prototype = {
 			setTimeout(function() {$(that).removeClass('hidden') }, 2000);
 		});
 
-		if (getMyViewerId() === data.viewer_id) {
+		if (this.getSelfId() === data.viewer_id) {
 			$('#' + data.viewer_id).addClass('self-editor');
 		}
 	},
@@ -112,7 +104,7 @@ Viewer.prototype = {
 	 * @param {Boolean} active
 	 */
 	_setActive: function (viewerId, active) {
-		if (viewerId === getMyViewerId()) return;
+		if (viewerId === this.getSelfId()) return;
 		var $viewerIcon = $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]');
 
 		if (active === $viewerIcon.hasClass('active-viewer')) return;
@@ -129,7 +121,7 @@ Viewer.prototype = {
 	 * @param {String} viewerId
 	 * @return {Boolean}
 	 */
-	isActive: function (viewerId) {
+	_isActive: function (viewerId) {
 		return $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]').hasClass('active-viewer');
 	},
 
@@ -146,20 +138,29 @@ Viewer.prototype = {
 
 
 	/**
-	 * ユーザーアイコンを変更する
+	 * ユーザーアイコンを適用する
 	 * @param  {String} imageUrl - 新しいアイコンのURL
 	 * @param  {String} viewerId
 	 */
-	changeIcon: function (imageUrl, viewerId) {
-		if (viewerId === getMyViewerId()) {
+	_applyIcon: function (imageUrl, viewerId) {
+		if (viewerId === this.getSelfId()) {
 			roomInfo.viewer.image = imageUrl;
 		}
 		this.viewerInfoList[viewerId].image = imageUrl;
 		$('#' + viewerId + ' .editor-user-icon, .' + viewerId).css('background-image', 'url(' + imageUrl + ')');
+	},
+
+
+	/**
+	 * 自身のViewerIDを取得する
+	 * @return {String} viewerId
+	 */
+	getSelfId: function () {
+		return roomInfo.viewer.viewer_id || localSession.get(roomInfo.room.id);
 	}
 }
 
-var viewer = new Viewer(editorList);
+var viewer = new Viewer();
 
 
 /**

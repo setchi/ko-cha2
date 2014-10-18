@@ -128,12 +128,12 @@
 	echo Asset::js('lib/notify.js');
 	echo Asset::js('common.js');
 	echo Asset::js('utils.js');
+	echo Asset::js('viewer.js');
 	echo Asset::js('editor-tab.js');
 	echo Asset::js('editor.js');
 	echo Asset::js('editor-list.js');
 	echo Asset::js('connection.js');
 	echo Asset::js('ui.js');
-	echo Asset::js('viewer.js');
 	echo Asset::js('filedrop.js');
 	echo Asset::js('chat.js');
 	echo Asset::js('update.js');
@@ -145,12 +145,12 @@
 	Casset::js('lib/notify.js');
 	Casset::js('common.js');
 	Casset::js('utils.js');
+	Casset::js('viewer.js');
 	Casset::js('editor-tab.js');
 	Casset::js('editor.js');
 	Casset::js('editor-list.js');
 	Casset::js('connection.js');
 	Casset::js('ui.js');
-	Casset::js('viewer.js');
 	Casset::js('filedrop.js');
 	Casset::js('chat.js');
 	Casset::js('update.js');

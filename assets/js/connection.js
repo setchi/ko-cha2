@@ -165,7 +165,7 @@ Connection.prototype = {
 			var conn = this.peer.connect(peerId, {
 				reliable: true,
 				metadata: {
-					viewerId: getMyViewerId(),
+					viewerId: viewer.getSelfId(),
 					num: num++
 				}
 			});
@@ -192,7 +192,7 @@ Connection.prototype = {
 	 */
 	send: function (data, sync) {
 		var async = !sync;
-		data['viewer_id'] = getMyViewerId();
+		data['viewer_id'] = viewer.getSelfId();
 
 		$.ajax({
 			url: roomInfo.room.id + '/chat/push.json',
@@ -215,7 +215,7 @@ Connection.prototype = {
 	 * @param  {Number} lastTime
 	 */
 	_watch: function (lastChatId, lastTime) {
-		var viewerId = getMyViewerId();
+		var viewerId = viewer.getSelfId();
 
 		$.ajax({
 			url: roomInfo.room.id + '/chat/watch.json',
