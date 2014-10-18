@@ -23,7 +23,7 @@ var Connection = function () {
 };
 Connection.prototype = {
 	/**
-	 * 接続切断
+	 * ページを離れるときに呼び出される
 	 */
 	_disconnect: function () {
 		this.peer.destroy();
@@ -41,7 +41,7 @@ Connection.prototype = {
 	_init: function (selfViewerInfo) {
 		roomInfo.viewer = selfViewerInfo;
 		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
-		this._initPeer();
+		this._createPeerConnection();
 		viewer.init(selfViewerInfo.viewer_id);
 		editorList.init();
 
@@ -56,7 +56,7 @@ Connection.prototype = {
 	/**
 	 * Peer接続の初期化
 	 */
-	_initPeer: function () {
+	_createPeerConnection: function () {
 		var _self = this;
 		this.peer = new Peer({
 			key: 'e2cc565a-4d67-11e4-a512-5552163100a0',
@@ -105,7 +105,12 @@ Connection.prototype = {
 			_self._onRTC(data);
 		});
 
-		conn.on('open', function (e) {
+		conn.on('open', function () {
+			// 相手が最初に接続成功したのが自分の場合、現在までのチャットログを送信する
+			if (!viewer.isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
+				conn.send({ updated: true, chat_log: Chat.log });
+			}
+
 			editorList.get(getMyViewerId()).send();
 			viewer.setActive(conn.metadata.viewerId, true);
 		});
@@ -121,17 +126,22 @@ Connection.prototype = {
 	 * Peer接続のオファーを受信
 	 * @param  {String} peerId
 	 */
-	onOffer: function (peerId) {
-		console.log('onOffer', peerId);
+	onOffer: (function () {
+		var num = 0;
 
-		var conn = this.peer.connect(peerId, {
-			reliable: true,
-			metadata: {
-				viewerId: getMyViewerId()
-			}
-		});
-		this._setupDataConnection(conn);
-	},
+		return function (peerId) {
+			console.log('onOffer', peerId);
+
+			var conn = this.peer.connect(peerId, {
+				reliable: true,
+				metadata: {
+					viewerId: getMyViewerId(),
+					num: num++
+				}
+			});
+			this._setupDataConnection(conn);
+		}
+	}()),
 
 
 	/**

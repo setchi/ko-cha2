@@ -73,7 +73,7 @@ header.navbar {
 	opacity: 0.3;
 }
 
-.viewer-list li.reception {
+.viewer-list li.active-viewer.reception {
 	box-shadow: 1px 1px 2px 0px #0f0;
 	-webkit-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
 	-moz-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;

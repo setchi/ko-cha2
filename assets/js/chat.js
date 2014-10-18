@@ -12,6 +12,13 @@ var Chat = {
 
 
 	/**
+	 * チャットログを保持する
+	 * @type {Array}
+	 */
+	log: [],
+
+
+	/**
 	 * 初期化済みか
 	 * @type {Boolean}
 	 */
@@ -61,6 +68,7 @@ var Chat = {
 			// TODO: ついさっきスクリプトから挿入した自分の発言が、サーバーからも送られて来るので無視している。もっと構造を整える。
 			if (!selfEnter && this.initialized && roomInfo.viewer.viewer_id === data.viewer_id) continue;
 
+			this.log.push($.extend(true, {}, data));
 			data.message = decodeURIComponent(data.message);
 
 			// html = message + html;

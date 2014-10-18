@@ -106,6 +106,16 @@ Viewer.prototype = {
 
 
 	/**
+	 * Viewerがアクティブかどうか
+	 * @param {String} viewerId
+	 * @return {Boolean}
+	 */
+	isActive: function (viewerId) {
+		return $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]').hasClass('active-viewer');
+	},
+
+
+	/**
 	 * ユーザーアイコンのHTML生成
 	 * @param  {String} fileName
 	 * @return {String} HTML
