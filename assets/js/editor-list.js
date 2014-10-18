@@ -65,6 +65,38 @@ EditorList.prototype = {
 				}
 			}
 		});
+		
+		var commandList = {
+			removeTab: function (editorData) {
+				editorList.get(editorData.viewerId).removeTab(editorData.tabId);
+			}
+		}
+
+		// 誰かが入室したら自分のデータを送信する
+		connection.on('open', function (conn) {
+			this.get(getMyViewerId()).send();
+		}.bind(this));
+
+		// データ受信時
+		connection.on('received', function (data) {
+			for (var state in data) {
+				if (!(/^editor_/.test(state))) continue;
+
+				for (var i in data[state].data) {
+					var editorData = data[state].data[i].data;
+					if ((typeof editorData) === 'string') {
+						editorData = JSON.parse(editorData);
+					}
+
+					if (editorData.command === undefined) {
+						this.update(editorData);
+
+					} else if (editorData.command in commandList) {
+						commandList[editorData.command](editorData);
+					}
+				}
+			}
+		}.bind(this));
 	},
 
 

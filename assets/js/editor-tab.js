@@ -199,12 +199,7 @@ Tab.prototype = {
 		this.setTheme('cobalt');
 		this.setMode('c_cpp');
 		this.ace.setFontSize(12);
-
-		if (this.isSelf) {
-			this._initSelf();
-		} else {
-			this.ace.setReadOnly(true);
-		}
+		this.isSelf ? this._initSelf() : this.ace.setReadOnly(true);
 	},
 
 
@@ -212,73 +207,59 @@ Tab.prototype = {
 	 * 自身の初期化(エディタが操作されたらメンバーに送信など)
 	 */
 	_initSelf: function () {
-		var _self = this;
-
-		/**
-		 * データを送信する
-		 * @param  {String} type - 送信タイプ
-		 * @param  {Object} data
-		 * @param  {Boolean} toServer - サーバに送信するならtrue
-		 * @param  {String} command
-		 */
-		this._sendData = function (type, data, toServer, command) {
-			// TODO: この中をもっと整える
-			var tmpData = {
-				viewerId: _self._viewerId,
-				tabId: _self._tabId,
-				tabName: encodeURIComponent(_self.tabName),
-				data: data
-			};
-
-			if (command) {
-				tmpData.command = command;
-			}
-
-			var editorData = {
-				type: 'editor_change_' + type,
-				data: JSON.stringify(tmpData)
-			};
-
-			if (toServer) {
-				connection.send(editorData);
-				return;
-			}
-
-			var sendData = {};
-			sendData.updated = true;
-			sendData['editor_change_' + type] = {
-				type: '',
-				data: [editorData]
-			};
-
-			connection.sendRTC(sendData);
-		}
-
 		var sendActionList = [
 			'insertText',
 			'removeText',
 			'insertLines',
 			'removeLines'
 		];
-		// イベント登録
-		_self.ace.session.on('change', function (e) {
+		var sendState = function () {this._sendData('state', this.getState())}.bind(this);
+		this.ace.session.on('changeScrollLeft', sendState);
+		this.ace.session.on('changeScrollTop', sendState);
+		this.ace.session.selection.on('changeSelection', sendState);
+		this.ace.session.selection.on('changeCursor', sendState);
+		this.ace.session.on('change', function (e) {
 			if (sendActionList.indexOf(e.data.action) == -1) {
 				return;
 			}
-			_self._sendData('text', { text: _self.getText() });
-		});
-		_self.ace.session.on('changeScrollLeft', function () {
-			_self._sendData('state', _self.getState());
-		});
-		_self.ace.session.on('changeScrollTop', function () {
-			_self._sendData('state', _self.getState());
-		});
-		_self.ace.session.selection.on('changeSelection', function () {
-			_self._sendData('state', _self.getState());
-		});
-		_self.ace.session.selection.on('changeCursor', function () {
-			_self._sendData('state', _self.getState());
-		});
+			this._sendData('text', { text: this.getText() });
+		}.bind(this));
+	},
+
+
+	/**
+	 * データを送信する
+	 * @param  {String} type - 送信タイプ
+	 * @param  {Object} data
+	 * @param  {Boolean} toServer - サーバに送信するならtrue
+	 * @param  {String} command
+	 */
+	_sendData: function (type, data, toServer, command) {
+		// TODO: この中をもっと整える
+		var tmpData = {
+			viewerId: this._viewerId,
+			tabId: this._tabId,
+			tabName: encodeURIComponent(this.tabName),
+			data: data
+		};
+		if (command) tmpData.command = command;
+
+		var editorData = {
+			type: 'editor_change_' + type,
+			data: JSON.stringify(tmpData)
+		};
+		if (toServer) {
+			connection.send(editorData);
+			return;
+		}
+
+		var sendData = {};
+		sendData.updated = true;
+		sendData[editorData.type] = {
+			type: '',
+			data: [editorData]
+		};
+		connection.sendRTC(sendData);
 	},
 
 
@@ -311,24 +292,23 @@ Tab.prototype = {
 	 * @param {Function} arrayBufferToString - ArrayBufferの内容を文字列に変換する関数
 	 */
 	startMonitoringFile: function (file, arrayBufferToString) {
-		var _self = this;
 		this._fileLastMod = file.lastModifiedDate;
+		clearInterval(this._fileMonitorTimer);
 
-		function applyIfUpdated() {
-			if (_self._fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
-				_self._fileLastMod = file.lastModifiedDate;
+		this._fileMonitorTimer = setInterval(function () {
+			if (this._fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
+				this._fileLastMod = file.lastModifiedDate;
 				var reader = new FileReader();
+
 				reader.onload = function (e) {
-					_self.applyData({
+					this.applyData({
 						text: arrayBufferToString(e.target.result)
 					});
-				}
+				}.bind(this);
 				reader.readAsArrayBuffer(file);
 			}
-		}
+		}.bind(this), 1000);
 
-		clearInterval(this._fileMonitorTimer);
-		this._fileMonitorTimer = setInterval(applyIfUpdated, 1000);
 		return this;
 	},
 

@@ -243,12 +243,11 @@ Editor.prototype = {
 	tabResize: (function () {
 		var timer;
 		return function () {
-			var _self = this;
 			clearTimeout(timer);
 			timer = setTimeout(function() {
-				var tabWidth = (_self.$root.width() - 100) / getSize(_self.tabList);
-				_self.$root.find('.tab-item').width(tabWidth).find('.label').width(tabWidth - (tabWidth / 200 * 60) - 10);
-			}, 100);
+				var tabWidth = (this.$root.width() - 100) / getSize(this.tabList);
+				this.$root.find('.tab-item').width(tabWidth).find('.label').width(tabWidth - (tabWidth / 200 * 60) - 10);
+			}.bind(this), 100);
 		}
 	}()),
 

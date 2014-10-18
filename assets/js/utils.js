@@ -29,6 +29,22 @@ function getSize(obj) {
 
 
 /**
+ * HTML特殊文字をエスケープする
+ * @param  {String} str
+ * @return {String} エスケープされた文字列
+ */
+ function escapeHTML(str) {
+	var obj = document.createElement('pre');
+	if (typeof obj.textContent != 'undefined') {
+		obj.textContent = str;
+	} else {
+		obj.innerText = str;
+	}
+	return obj.innerHTML;
+}
+
+
+/**
  * イベントをキャンセルする
  * @param  {Object} e
  * @return {Boolean} false

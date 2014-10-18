@@ -41,6 +41,27 @@ Viewer.prototype = {
 			var sns = $(this).data('sns');
 			window.open('auth/login/' + sns, '', 'width=800,height=500');
 		});
+
+		// 接続が完了したとき
+		connection.on('open', function (conn) {
+			if (!this.isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
+				conn.send({ updated: true, chat_log: Chat.log });
+			}
+			this._setActive(conn.metadata.viewerId, true);
+		}.bind(this));
+
+		// 接続が切断されたとき
+		connection.on('close', function (conn) {
+			this._setActive(conn.metadata.viewerId, false);
+		}.bind(this));
+
+		// データを受信したとき
+		connection.on('received', function (data) {
+			for (var state in data) {
+				if (state !== 'update_viewer') continue;
+				this._update(data[state].list);
+			}
+		}.bind(this));
 	},
 
 
@@ -48,7 +69,7 @@ Viewer.prototype = {
 	 * 受信データを反映
 	 * @param  {Object} data
 	 */
-	update: function (data) {
+	_update: function (data) {
 		for (var i in data) {
 			if (!(data[i].viewer_id in this.viewerInfoList)) {
 				this.add(data[i]);
@@ -90,7 +111,7 @@ Viewer.prototype = {
 	 * @param {String} viewerId
 	 * @param {Boolean} active
 	 */
-	setActive: function (viewerId, active) {
+	_setActive: function (viewerId, active) {
 		if (viewerId === getMyViewerId()) return;
 		var $viewerIcon = $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]');
 

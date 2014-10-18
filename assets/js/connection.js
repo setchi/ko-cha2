@@ -15,13 +15,49 @@ var Connection = function () {
 	this._watch(-1, -1);
 
 
+};
+Connection.prototype = {
 	/**
 	 * viewerIdごとのDataConnectionのインスタンスを保持する
 	 * @type {Map<String, DataConnection>}
 	 */
-	this._connectionList = {};
-};
-Connection.prototype = {
+	_connectionList: {},
+
+
+	/**
+	 * イベントハンドラ
+	 * @type {Map<String, Array<Function>>}
+	 */
+	_listeners: {},
+
+
+	/**
+	* イベントを登録する
+	* @param {String} eventName open, close, error, received
+	* @param {Function} listener
+	*/
+	on: function(eventName, listener){
+		if(!this._listeners[eventName]){
+			this._listeners[eventName] = [];
+		}
+		this._listeners[eventName].push(listener);
+	},
+
+
+	/**
+	 * イベントを発火する
+	 * @param  {String} eventName [args...]
+	 */
+	_fire: function(eventName){
+		var args = $.extend(true, [], arguments);
+		args.shift();
+
+		(this._listeners[eventName] || []).forEach(function(listener){
+			listener.apply(this, args);
+		});
+	},
+
+
 	/**
 	 * ページを離れるときに呼び出される
 	 */
@@ -41,15 +77,13 @@ Connection.prototype = {
 	_init: function (selfViewerInfo) {
 		roomInfo.viewer = selfViewerInfo;
 		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
-		this._createPeerConnection();
 		viewer.init(selfViewerInfo.viewer_id);
 		editorList.init();
+		Chat.init();
+		this._createPeerConnection();
 
 		// ページを離れるとき
-		var _self = this;
-		window.onbeforeunload = function () {
-			_self._disconnect();
-		}
+		window.onbeforeunload = this._disconnect.bind(this);
 	},
 
 
@@ -57,7 +91,6 @@ Connection.prototype = {
 	 * Peer接続の初期化
 	 */
 	_createPeerConnection: function () {
-		var _self = this;
 		this.peer = new Peer({
 			key: 'e2cc565a-4d67-11e4-a512-5552163100a0',
 			config: {
@@ -77,21 +110,21 @@ Connection.prototype = {
 
 		this.peer.on('open', function (myPeerId) {
 			console.log('My peer ID Is: ' + myPeerId);
-			_self.send({
+			this.send({
 				type: 'update_peer_id',
 				data: { 'peer_id': myPeerId }
 			})
-		});
+		}.bind(this));
 
 		this.peer.on('error', function (err) {
 			console.log(err);
-		});
+		}.bind(this));
 
 		this.peer.on('connection', function (conn) {
 			console.log('metadata: ', conn.metadata);
-			_self._connectionList[conn.metadata.viewerId] = conn;
-			_self._setupDataConnection(conn);
-		});
+			this._connectionList[conn.metadata.viewerId] = conn;
+			this._setupDataConnection(conn);
+		}.bind(this));
 	},
 
 
@@ -100,25 +133,22 @@ Connection.prototype = {
 	 * @param  {DataConnection} conn
 	 */
 	_setupDataConnection: function (conn) {
-		var _self = this;
 		conn.on('data', function (data) {
-			_self._onRTC(data);
-		});
+			this._fire('received', data);
+		}.bind(this));
+
+		conn.on('error', function (e) {
+			this._fire('error', e);
+		}.bind(this));
 
 		conn.on('open', function () {
-			// 相手が最初に接続成功したのが自分の場合、現在までのチャットログを送信する
-			if (!viewer.isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
-				conn.send({ updated: true, chat_log: Chat.log });
-			}
-
-			editorList.get(getMyViewerId()).send();
-			viewer.setActive(conn.metadata.viewerId, true);
-		});
+			this._fire('open', conn);
+		}.bind(this));
 
 		conn.on('close', function () {
-			viewer.setActive(conn.metadata.viewerId, false);
-			delete _self._connectionList[conn.metadata.viewerId];
-		});
+			this._fire('close', conn);
+			delete this._connectionList[conn.metadata.viewerId];
+		}.bind(this));
 	},
 
 
@@ -142,15 +172,6 @@ Connection.prototype = {
 			this._setupDataConnection(conn);
 		}
 	}()),
-
-
-	/**
-	 * Peerからデータを受信
-	 * @param  {Object} data
-	 */
-	_onRTC: function (data) {
-		dataUpdate(data);
-	},
 
 
 	/**
@@ -184,7 +205,7 @@ Connection.prototype = {
 				// location.reload();
 				console.warn('Error!', e);
 			}
-		});
+		}.bind(this));
 	},
 
 
@@ -194,7 +215,6 @@ Connection.prototype = {
 	 * @param  {Number} lastTime
 	 */
 	_watch: function (lastChatId, lastTime) {
-		var _self = this;
 		var viewerId = getMyViewerId();
 
 		$.ajax({
@@ -207,32 +227,32 @@ Connection.prototype = {
 				'last_time': lastTime,
 				'viewer_id': viewerId
 			}
-		}).done(function (e) {
-			if (e['error']) {
+		}).done(function (data) {
+			if (data['error']) {
 				// location.reload();
-				console.warn('Error!', e);
+				console.warn('Error!', data);
 				setTimeout(function () {
-					_self._watch(lastChatId, lastTime);
+					this._watch(lastChatId, lastTime);
 				}, 500);
 				return;
 			}
 
-			if (e['updated']) {
-				lastChatId = e['last_chat_id'];
-				lastTime = e['time'];
-				dataUpdate(e);
+			if (data['updated']) {
+				lastChatId = data['last_chat_id'];
+				lastTime = data['time'];
+				this._fire('received', data);
 			}
 
-			if (e['viewer']) {
-				_self._init(e['viewer']);
+			if (data['viewer']) {
+				this._init(data['viewer']);
 				lastChatId = 0;
 				lastTime = 0;
 			}
 
-			_self._watch(lastChatId, lastTime);
-		}).fail(function () {
-			_self._watch(lastChatId, lastTime);
-		});
+			this._watch(lastChatId, lastTime);
+		}.bind(this)).fail(function () {
+			this._watch(lastChatId, lastTime);
+		}.bind(this));
 	}
 }
 var connection = new Connection();
