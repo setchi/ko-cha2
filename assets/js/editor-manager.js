@@ -1,8 +1,8 @@
 /**
- * エディタ全体の管理
+ * 全Viewerのエディタの管理
  */
-var EditorList = function () {};
-EditorList.prototype = {
+var EditorManager = function () {};
+EditorManager.prototype = {
 	/**
 	 * Viewerごとのエディタのインスタンスを保持するリスト
 	 * @type {Array}
@@ -75,7 +75,7 @@ EditorList.prototype = {
 	 * @param {String} viewerId
 	 */
 	add: function (viewerId) {
-		this.editorList[viewerId] = new Editor(viewerId, 4).hide();
+		this.editorList[viewerId] = new EditorObject(viewerId, 4).hide();
 	},
 
 

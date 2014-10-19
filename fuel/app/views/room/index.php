@@ -129,12 +129,13 @@
 	echo Asset::js('utils.js');
 	echo Asset::js('viewer.js');
 	echo Asset::js('editor-tab.js');
-	echo Asset::js('editor.js');
-	echo Asset::js('editor-list.js');
+	echo Asset::js('editor-object.js');
+	echo Asset::js('editor-manager.js');
 	echo Asset::js('connection.js');
-	echo Asset::js('filedrop.js');
 	echo Asset::js('chat.js');
-	echo Asset::js('ui.js');
+	echo Asset::js('ui-event.js');
+	echo Asset::js('ui-filedrop.js');
+	echo Asset::js('ui-main.js');
 	echo Asset::js('main.js');
 	echo Asset::js('sdk/sdk.js');
 /*/
@@ -146,12 +147,13 @@
 	Casset::js('utils.js');
 	Casset::js('viewer.js');
 	Casset::js('editor-tab.js');
-	Casset::js('editor.js');
-	Casset::js('editor-list.js');
+	Casset::js('editor-object.js');
+	Casset::js('editor-manager.js');
 	Casset::js('connection.js');
-	Casset::js('filedrop.js');
 	Casset::js('chat.js');
-	Casset::js('ui.js');
+	Casset::js('ui-event.js');
+	Casset::js('ui-filedrop.js');
+	Casset::js('ui-main.js');
 	Casset::js('main.js');
 	Casset::js('sdk/sdk.js');
 	echo Casset::render_js();

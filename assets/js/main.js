@@ -1,7 +1,7 @@
 var connection = new Connection();
 
 (function () {
-	var editorList = new EditorList();
+	var editorManager = new EditorManager();
 	var viewer = new Viewer();
 
 	// 相手から接続要求が来た時
@@ -12,7 +12,7 @@ var connection = new Connection();
 
 	// 新規Viewerが入室した時
 	viewer.on('add-viewer', function (viewerId) {
-		editorList.add(viewerId);
+		editorManager.add(viewerId);
 	});
 
 
@@ -24,7 +24,7 @@ var connection = new Connection();
 	connection.on('init', function (selfViewerInfo) {
 		viewer.init(selfViewerInfo);
 		Chat.init(connection);
-		editorList.init();
+		editorManager.init();
 	});
 
 
@@ -38,7 +38,7 @@ var connection = new Connection();
 			conn.send({ updated: true, chat_log: Chat.getHistory() });
 
 			// 全Viewerのエディタの状態を送信
-			editorList.send(conn);
+			editorManager.send(conn);
 		}
 		viewer.setActive(conn.metadata.viewerId, true);
 	});
@@ -52,7 +52,7 @@ var connection = new Connection();
 		
 	var commandList = {
 		removeTab: function (editorData) {
-			editorList.get(editorData.viewerId).removeTab(editorData.tabId);
+			editorManager.get(editorData.viewerId).removeTab(editorData.tabId);
 		}
 	}
 
@@ -77,7 +77,7 @@ var connection = new Connection();
 					}
 
 					if (editorData.command === undefined) {
-						editorList.update(editorData);
+						editorManager.update(editorData);
 
 					} else if (editorData.command in commandList) {
 						commandList[editorData.command](editorData);
@@ -97,37 +97,37 @@ var connection = new Connection();
 
 	// 表示タブを切り替えた
 	UIEvent.on('switch-tab', function (viewerId, tabId) {
-		editorList.get(viewerId).changeActiveTab(tabId);
+		editorManager.get(viewerId).changeActiveTab(tabId);
 	});
 
 
 	// タブを削除した
 	UIEvent.on('remove-tab', function (viewerId, tabId) {
-		editorList.get(viewerId).removeTab(tabId);
+		editorManager.get(viewerId).removeTab(tabId);
 	});
 
 
 	// タブのレイアウトを変更
 	UIEvent.on('switch-tab-layout', function (viewerId, tabId, layout) {
-		editorList.get(viewerId).setLayout(tabId, layout);
+		editorManager.get(viewerId).setLayout(tabId, layout);
 	});
 
 
 	// エディタのレイアウトを変更
 	UIEvent.on('switch-editor-layout', function (viewerId, layout) {
-		editorList.setLayout(viewerId, layout);
+		editorManager.setLayout(viewerId, layout);
 	});
 
 
 	// エディタのリサイズ
 	UIEvent.on('editor-resize', function (rootWidth, rootHeight) {
-		editorList.resize(rootWidth, rootHeight);
+		editorManager.resize(rootWidth, rootHeight);
 	});
 
 
 	// ファイルがドロップされた
 	UIEvent.on('file-dropped', function (file, mode, content) {
-		var targetEditor = editorList.get(localSession.get(roomInfo.room.id));
+		var targetEditor = editorManager.get(localSession.get(roomInfo.room.id));
 		var targetTab = targetEditor.addTab(file.name);
 
 		// エディタに情報を反映、ファイルの更新監視開始
@@ -140,7 +140,7 @@ var connection = new Connection();
 		
 		// 自分のエディタを開いていなければ表示
 		if (!targetEditor.isViewing()) {
-			editorList.setLayout(localSession.get(roomInfo.room.id), 4);
+			editorManager.setLayout(localSession.get(roomInfo.room.id), 4);
 		}
 		targetEditor.changeActiveTab(targetTab.id);
 	});

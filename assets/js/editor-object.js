@@ -1,9 +1,9 @@
 ﻿/**
- * Viewerごとのエディタの管理
+ * エディタオブジェクトの制御
  * @param {String} viewerId
  * @param {Number} state 初期位置フラグ
  */
-var Editor = function (viewerId, state) {
+var EditorObject = function (viewerId, state) {
 	// HTML要素を生成する
 	$('#ko-cha-templates').find('.editor-root').clone().attr('id', viewerId).appendTo('#editor-region');
 
@@ -75,7 +75,7 @@ var Editor = function (viewerId, state) {
 		this._initSelfEditor();
 	}
 }
-Editor.prototype = {
+EditorObject.prototype = {
 	/**
 	 * 自身のエディタの初期化
 	 */

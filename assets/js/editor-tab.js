@@ -1,5 +1,5 @@
 /**
- * Viewerごとのタブの管理
+ * タブ単体の制御
  * @param {String} viewerId
  * @param {String} tabId
  * @param {String} tabName
