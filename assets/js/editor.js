@@ -69,7 +69,7 @@ var Editor = function (viewerId, state) {
 	 * 自身かどうか
 	 * @type {Boolean}
 	 */
-	this.isSelf = viewerId === viewer.getSelfId();
+	this.isSelf = viewerId === localSession.get(roomInfo.room.id);
 
 	if (this.isSelf) {
 		this._initSelfEditor();

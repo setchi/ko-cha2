@@ -37,7 +37,7 @@ var Tab = function (viewerId, tabId, tabName) {
 	 * 自身かどうか
 	 * @type {Boolean}
 	 */
-	this.isSelf = viewerId === viewer.getSelfId();
+	this.isSelf = viewerId === localSession.get(roomInfo.room.id);
 
 
 	/**
@@ -291,9 +291,8 @@ Tab.prototype = {
 	/**
 	 * ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
 	 * @param {File} file
-	 * @param {Function} arrayBufferToString - ArrayBufferの内容を文字列に変換する関数
 	 */
-	startMonitoringFile: function (file, arrayBufferToString) {
+	startMonitoringFile: function (file) {
 		this._fileLastMod = file.lastModifiedDate;
 		clearInterval(this._fileMonitorTimer);
 
@@ -304,7 +303,7 @@ Tab.prototype = {
 
 				reader.onload = function (e) {
 					this.applyData({
-						text: arrayBufferToString(e.target.result)
+						text: Utils.arrayBufferToString(e.target.result)
 					});
 				}.bind(this);
 				reader.readAsArrayBuffer(file);

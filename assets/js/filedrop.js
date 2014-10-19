@@ -108,53 +108,18 @@ function readFile (file) {
 		alert("File API がサポートされていません。");
 		return false;
 	}
-
 	var ext = getExtByFilename(file.name);
 	var fileReader = new FileReader();
+
 	fileReader.onload = function (e) {
-		var targetEditor = editorList.get(roomInfo.viewer.viewer_id);
-		var targetTab = targetEditor.addTab(file.name);
-		var text = arrayBufferToString(e.target.result);
-
-		// エディタに情報を反映、ファイルの更新監視開始
-		targetTab.startMonitoringFile(file, arrayBufferToString).applyData({
-			text: encodeURIComponent(text),
-			mode: getModeByExt(ext)
-		});
-
-		targetTab.send({
-			mode: getModeByExt(ext)
-		});
-		
-		// 自分のエディタを開いていなければ表示
-		if (!targetEditor.isViewing()) {
-			editorList.setLayout(roomInfo.viewer.viewer_id, 4);
-		}
-		targetEditor.changeActiveTab(file.name);
+		UIEvent.fire(
+			'file-dropped',
+			file,
+			getModeByExt(ext),
+			Utils.arrayBufferToString(e.target.result)
+		);
 	}
 	fileReader.readAsArrayBuffer(file);
-}
-
-
-/**
- * ArrayBufferの内容を文字列に変換する
- * @param  {ArrayBuffer} arrayBuffer
- * @return {String} 文字列
- */
-function arrayBufferToString (arrayBuffer) {
-	var array = new Uint8Array(arrayBuffer);
-
-	// ArrayBufferを適切なViewで処理 (様々な文字コードに対応させる)
-	switch (Encoding.detect(array)) {
-	case 'UTF16':
-		array = new Uint16Array(arrayBuffer);
-		break;
-	case 'UTF32':
-		array = new Uint32Array(arrayBuffer);
-		break;
-	}
-	array = Encoding.convert(array, 'UNICODE');
-	return Encoding.codeToString(array);
 }
 
 

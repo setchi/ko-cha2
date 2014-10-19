@@ -7,7 +7,7 @@ var Chat = {
 	 * チャットログを保持する
 	 * @type {Array}
 	 */
-	log: [],
+	_history: [],
 
 
 	/**
@@ -38,16 +38,12 @@ var Chat = {
 	_linkText: '<a href="%s" target="_blank">%s</a>',
 
 
-	init: function () {
+	/**
+	 * 初期化
+	 * @param  {Connection} connection
+	 */
+	init: function (connection) {
 		var _self = this;
-
-		// データ受信時
-		connection.on('received', function (data) {
-			for (var state in data) {
-				if (state !== 'chat_log') continue;
-				_self._insert(data[state]);
-			}
-		});
 
 		// テキストボックスでエンターキーが押されたら送信
 		$('.js_chat_send').keydown(function (e) {
@@ -58,6 +54,34 @@ var Chat = {
 			_self._send(message);
 			$(this).val('');
 		});
+
+
+		/**
+		 * 発言する
+		 * @param  {String} message
+		 */
+		this._send = function (message) {
+			var data = roomInfo.viewer;
+			data['message'] = encodeURIComponent(message);
+			this.update([data], true);
+
+			//*
+			connection.sendRTC({
+				updated: true,
+				chat_log: [{
+					viewer_id: localSession.get(roomInfo.room.id),
+					image: roomInfo.viewer.image,
+					message: encodeURIComponent(message)
+				}]
+			});
+
+			/*/
+			connection.send({
+				type: 'chat_log',
+				data: message
+			});
+			// */
+		}
 	},
 
 
@@ -66,37 +90,37 @@ var Chat = {
 	 * @param  {Object} logs      受信したログのリスト
 	 * @param  {Boolean} selfEnter 自身の発言による挿入か
 	 */
-	_insert: function (logs, selfEnter) {
-		var html = '', currentHtml = this._$log.html();
+	update: function (logs, selfEnter) {
+		var html = '', currentHtml = $.trim(this._$log.html());
 
 		for (var i in logs) {
 			var data = logs[i];
 			// TODO: ついさっきスクリプトから挿入した自分の発言が、サーバーからも送られて来るので無視している。もっと構造を整える。
-			if (!selfEnter && !currentHtml && viewer.getSelfId() === data.viewer_id) continue;
+			if (!selfEnter && currentHtml !== '' && localSession.get(roomInfo.room.id) === data.viewer_id) continue;
 
-			this.log.push($.extend(true, {}, data));
+			this._history.push($.extend(true, {}, data));
 			data.message = decodeURIComponent(data.message);
 
 			// html = message + html;
 			var string = "", isImage = false;
 			if (data.message.match('\\[image\\](.*)\\[/image\\]')) {
 				isImage = true;
-				string = this._genImageHTML(data);
+				string = this._getImageHTML(data);
 
 			} else {
-				string = this._genRemarkHTML(data);
+				string = this._getRemarkHTML(data);
 			}
 			html = string + html;
 			
 			// 自分の更新でなく、今この画面を見ていなければデスクトップ通知を出す
-			if (roomInfo.viewer.viewer_id !== data.viewer_id) {
+			if (localSession.get(roomInfo.room.id) !== data.viewer_id) {
 				Utils.executeIfNotViewing(function () {
 					var myNotification = new Notify('Ko-cha', {
-						icon: viewer.getImageUrl(data.image),
+						icon: this.getIconUrl(data.image),
 						body: isImage ? "画像を送信しました。" : data.message
 					});
 					myNotification.show();
-				});
+				}.bind(this));
 			}
 		}
 
@@ -112,7 +136,7 @@ var Chat = {
 	 * @param  {Object} log
 	 * @return {String} ログHTML
 	 */
-	_genRemarkHTML: function (log) {
+	_getRemarkHTML: function (log) {
 		var message = Utils.escapeHTML(log.message).replace(this._regexURL, function () {
 			var url = "";
 			log.message.replace(this._regexURL, function ($1, $2) {
@@ -120,7 +144,7 @@ var Chat = {
 			});
 			return Utils.sprintf(this._linkText, url, url);
 		}.bind(this));
-		return Utils.sprintf(this._logText, log.viewer_id, viewer.getIconUrl(log.image), message);
+		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), message);
 	},
 
 
@@ -129,7 +153,7 @@ var Chat = {
 	 * @param  {Object} log
 	 * @return {String} 画像ログHTML
 	 */
-	_genImageHTML: function (log) {
+	_getImageHTML: function (log) {
 		var imageName = log.message.match('\\[image\\](.*)\\[/image\\]')[1];
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var imageUrl = baseUrl + imageName;
@@ -138,34 +162,26 @@ var Chat = {
 		var thumbUrl = baseUrl + 'thumb-' + imageName.substr(0, imageName.length-3) + thumbExt;
 
 		var image = '画像を送信しました。<a href="' + imageUrl + '" class="fancybox" title=""><img src="' + thumbUrl + '"></a>';
-		return Utils.sprintf(this._logText, log.viewer_id, viewer.getIconUrl(log.image), image);
+		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), image);
 	},
 
 
 	/**
-	 * 発言する
-	 * @param  {String} message
+	 * ユーザーアイコンのURL生成
+	 * @param  {String} fileName
+	 * @return {String} HTML
 	 */
-	_send: function (message) {
-		var data = roomInfo.viewer;
-		data['message'] = encodeURIComponent(message);
-		this._insert([data], true);
+	getIconUrl: function (fileName) {
+		fileName = "" + fileName;
+		return fileName.length < 10 ? 'assets/img/user/default/' + fileName + '.png' : fileName;
+	},
 
-		//*
-		connection.sendRTC({
-			updated: true,
-			chat_log: [{
-				viewer_id: viewer.getSelfId(),
-				image: roomInfo.viewer.image,
-				message: encodeURIComponent(message)
-			}]
-		});
 
-		/*/
-		connection.send({
-			type: 'chat_log',
-			data: message
-		});
-		// */
+	/**
+	 * チャット履歴を取得
+	 * @return {Object} チャット履歴
+	 */
+	getHistory: function () {
+		return this._history;
 	}
 }

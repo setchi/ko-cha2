@@ -13,8 +13,6 @@ var Connection = function () {
 	 * long polling監視開始
 	 */
 	this._watch(-1, -1);
-
-
 };
 Connection.prototype = {
 	/**
@@ -65,21 +63,17 @@ Connection.prototype = {
 		this.peer.destroy();
 		this.send({
 			type: 'exit_viewer',
-			data: roomInfo.viewer.viewer_id
+			data: localSession.get(roomInfo.room.id)
 		}, true);
 	},
 
 
 	/**
 	 * 初期化
-	 * @param  {String} selfViewerInfo
+	 * @param  {Object} selfViewerInfo
 	 */
 	_init: function (selfViewerInfo) {
-		roomInfo.viewer = selfViewerInfo;
-		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
-		viewer.init(selfViewerInfo.viewer_id);
-		editorList.init();
-		Chat.init();
+		this._fire('init', selfViewerInfo);
 		this._createPeerConnection();
 
 		// ページを離れるとき
@@ -165,7 +159,7 @@ Connection.prototype = {
 			var conn = this.peer.connect(peerId, {
 				reliable: true,
 				metadata: {
-					viewerId: viewer.getSelfId(),
+					viewerId: localSession.get(roomInfo.room.id),
 					num: num++
 				}
 			});
@@ -192,7 +186,7 @@ Connection.prototype = {
 	 */
 	send: function (data, sync) {
 		var async = !sync;
-		data['viewer_id'] = viewer.getSelfId();
+		data['viewer_id'] = localSession.get(roomInfo.room.id);
 
 		$.ajax({
 			url: roomInfo.room.id + '/chat/push.json',
@@ -215,7 +209,7 @@ Connection.prototype = {
 	 * @param  {Number} lastTime
 	 */
 	_watch: function (lastChatId, lastTime) {
-		var viewerId = viewer.getSelfId();
+		var viewerId = localSession.get(roomInfo.room.id);
 
 		$.ajax({
 			url: roomInfo.room.id + '/chat/watch.json',
@@ -255,4 +249,3 @@ Connection.prototype = {
 		}.bind(this));
 	}
 }
-var connection = new Connection();

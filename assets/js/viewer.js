@@ -1,59 +1,77 @@
 /**
  * Viewerに関する処理
  */
-var Viewer = function () {
+var Viewer = function () {};
+Viewer.prototype = {
 	/**
 	 * アイコンのHTMLテンプレート
 	 * @type {jQuery Object}
 	 */
-	this.$icon = $('#ko-cha-templates').find('.viewer-icon').clone();
+	$icon: $('#ko-cha-templates').find('.viewer-icon').clone(),
 
 
 	/**
 	 * Viewerの情報を保持する
 	 * @type {Object}
 	 */
-	this.viewerInfoList = {};
-}
-Viewer.prototype = {
+	viewerInfoList: {},
+
+
+	/**
+	 * イベントハンドラ
+	 * @type {Map<String, Array<Function>>}
+	 */
+	_listeners: {},
+
+
+	/**
+	* イベントを登録する
+	* @param {String} eventName on-offer, add-viewer
+	* @param {Function} listener
+	*/
+	on: function(eventName, listener){
+		if(!this._listeners[eventName]){
+			this._listeners[eventName] = [];
+		}
+		this._listeners[eventName].push(listener);
+	},
+
+
+	/**
+	 * イベントを発火する
+	 * @param  {String} eventName [args...]
+	 */
+	_fire: function(eventName){
+		var args = $.extend(true, [], arguments);
+		args.shift();
+
+		(this._listeners[eventName] || []).forEach(function(listener){
+			listener.apply(this, args);
+		});
+	},
+
+
 	/**
 	 * 初期化
+	 * @param  {Object} selfViewerInfo
 	 */
-	init: function (selfViewerId) {
-		// 自身のアイコン画像を適用
-		$('.js_my_icon').addClass(selfViewerId).css({
-			'background-image': 'url(' + this.getIconUrl(roomInfo.viewer.image) + ')'
-		});
+	init: function (selfViewerInfo) {
+		roomInfo.viewer = selfViewerInfo;
+		localSession.add(roomInfo.room.id, selfViewerInfo.viewer_id);
 
 		this._add(roomInfo.viewer);
-		$('.viewer-list').find('[data-viewer-id="' + roomInfo.viewer.viewer_id + '"]').addClass('active-viewer');
+		$('.viewer-list').find('[data-viewer-id="' + selfViewerInfo.viewer_id + '"]').addClass('active-viewer');
+
+		// 自身のアイコン画像を適用
+		$('.js_my_icon').addClass(selfViewerInfo.viewer_id).css({
+			'background-image': 'url(' + Chat.getIconUrl(selfViewerInfo.image) + ')'
+		});
 
 		// SNSログイン
 		$('.sns-login').find('span').click(function () {
 			var sns = $(this).data('sns');
 			window.open('auth/login/' + sns, '', 'width=800,height=500');
 		});
-
-		// 接続が完了したとき
-		connection.on('open', function (conn) {
-			if (!this._isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
-				conn.send({ updated: true, chat_log: Chat.log });
-			}
-			this._setActive(conn.metadata.viewerId, true);
-		}.bind(this));
-
-		// 接続が切断されたとき
-		connection.on('close', function (conn) {
-			this._setActive(conn.metadata.viewerId, false);
-		}.bind(this));
-
-		// データを受信したとき
-		connection.on('received', function (data) {
-			for (var state in data) {
-				if (state !== 'update_viewer') continue;
-				this._update(data[state].list);
-			}
-		}.bind(this));
 	},
 
 
@@ -61,17 +79,17 @@ Viewer.prototype = {
 	 * 受信データを反映
 	 * @param  {Object} data
 	 */
-	_update: function (data) {
+	update: function (data) {
 		for (var i in data) {
 			if (!(data[i].viewer_id in this.viewerInfoList)) {
 				this._add(data[i]);
 			}
 
-			this._applyIcon(this.getIconUrl(data[i].image), data[i].viewer_id);
+			this._applyIcon(Chat.getIconUrl(data[i].image), data[i].viewer_id);
 
 			// PeerConnectionのオファーが来た
-			if (data[i].peer_id && data[i].viewing == '1' && data[i].viewer_id !== this.getSelfId()) {
-				connection.onOffer(data[i].peer_id);
+			if (data[i].peer_id && data[i].viewing == '1' && data[i].viewer_id !== localSession.get(roomInfo.room.id)) {
+				this._fire('on-offer', data[i].peer_id);
 			}
 		}
 	},
@@ -82,9 +100,9 @@ Viewer.prototype = {
 	 * @param {Object} data
 	 */
 	_add: function (data) {
-		this.viewerInfoList[data.viewer_id] = data;
-		editorList.add(data.viewer_id);
+		this._fire('add-viewer', data.viewer_id);
 
+		this.viewerInfoList[data.viewer_id] = $.extend(true, {}, data);
 		this.$icon.clone().attr('data-viewer-id', data.viewer_id).addClass(data.viewer_id).appendTo(".viewer-list");
 		$('#' + data.viewer_id).find('.editor-user-icon').addClass(data.viewer_id).mouseenter(function () {
 			$(this).addClass('hidden');
@@ -92,7 +110,7 @@ Viewer.prototype = {
 			setTimeout(function() {$(that).removeClass('hidden') }, 2000);
 		});
 
-		if (this.getSelfId() === data.viewer_id) {
+		if (localSession.get(roomInfo.room.id) === data.viewer_id) {
 			$('#' + data.viewer_id).addClass('self-editor');
 		}
 	},
@@ -103,15 +121,15 @@ Viewer.prototype = {
 	 * @param {String} viewerId
 	 * @param {Boolean} active
 	 */
-	_setActive: function (viewerId, active) {
-		if (viewerId === this.getSelfId()) return;
+	setActive: function (viewerId, active) {
+		if (viewerId === localSession.get(roomInfo.room.id)) return;
 		var $viewerIcon = $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]');
 
 		if (active === $viewerIcon.hasClass('active-viewer')) return;
 		$viewerIcon[active ? 'addClass' : 'removeClass']('active-viewer');
 
 		// 右上の通知
-		var iconUrl = this.getIconUrl(this.viewerInfoList[viewerId].image);
+		var iconUrl = Chat.getIconUrl(this.viewerInfoList[viewerId].image);
 		toastr.info('<img src="' + iconUrl + '" width="32" height="32"> --- ' + (active ? '入室' : '退室') + 'しました。');
 	},
 
@@ -121,19 +139,8 @@ Viewer.prototype = {
 	 * @param {String} viewerId
 	 * @return {Boolean}
 	 */
-	_isActive: function (viewerId) {
+	isActive: function (viewerId) {
 		return $('.viewer-list').find('[data-viewer-id="' + viewerId + '"]').hasClass('active-viewer');
-	},
-
-
-	/**
-	 * ユーザーアイコンのHTML生成
-	 * @param  {String} fileName
-	 * @return {String} HTML
-	 */
-	getIconUrl: function (fileName) {
-		fileName = "" + fileName;
-		return fileName.length < 10 ? 'assets/img/user/default/' + fileName + '.png' : fileName;
 	},
 
 
@@ -143,24 +150,15 @@ Viewer.prototype = {
 	 * @param  {String} viewerId
 	 */
 	_applyIcon: function (imageUrl, viewerId) {
-		if (viewerId === this.getSelfId()) {
+		if (viewerId === localSession.get(roomInfo.room.id)) {
 			roomInfo.viewer.image = imageUrl;
 		}
+
+		console.log('_applyIcon');
 		this.viewerInfoList[viewerId].image = imageUrl;
 		$('#' + viewerId + ' .editor-user-icon, .' + viewerId).css('background-image', 'url(' + imageUrl + ')');
-	},
-
-
-	/**
-	 * 自身のViewerIDを取得する
-	 * @return {String} viewerId
-	 */
-	getSelfId: function () {
-		return roomInfo.viewer.viewer_id || localSession.get(roomInfo.room.id);
 	}
 }
-
-var viewer = new Viewer();
 
 
 /**

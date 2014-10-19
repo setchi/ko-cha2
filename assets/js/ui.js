@@ -1,3 +1,44 @@
+/**
+ * UIの操作に関するイベントを管理する
+ */
+var UIEvent = function () {};
+UIEvent.prototype = {
+	/**
+	 * イベントハンドラ
+	 * @type {Map<String, Array<Function>>}
+	 */
+	_listeners: {},
+
+
+	/**
+	* イベントを登録する
+	* @param {String} eventName on-offer, add-viewer
+	* @param {Function} listener
+	*/
+	on: function(eventName, listener){
+		if(!this._listeners[eventName]){
+			this._listeners[eventName] = [];
+		}
+		this._listeners[eventName].push(listener);
+	},
+
+
+	/**
+	 * イベントを発火する
+	 * @param  {String} eventName [args...]
+	 */
+	fire: function(eventName){
+		var args = $.extend(true, [], arguments);
+		args.shift();
+
+		(this._listeners[eventName] || []).forEach(function(listener){
+			listener.apply(this, args);
+		});
+	}
+}
+UIEvent = new UIEvent();
+
+
 /*
  * ユーザインタフェースの制御
  */
@@ -127,7 +168,7 @@ var Tab = {
 		this.rootWidth = this.$root.width();
 		this.rootHeight = this.$root.height();
 		this.targetId = this.$root.attr('id');
-		editorList.get(this.targetId).changeActiveTab($(target).data('tab-id'));
+		UIEvent.fire('switch-tab', this.targetId, $(target).data('tab-id'));
 		this.targetTabWidth = $(target).width();
 	},
 
@@ -138,7 +179,7 @@ var Tab = {
 		this.temporaryTab.remove();
 
 		if (this.frameState !== -1) {
-			editorList.get(this.targetId).setLayout($(this.target).data('tab-id'), this.frameState);
+			UIEvent.fire('switch-tab-layout', this.targetId, $(this.target).data('tab-id'), this.frameState);
 			this.frameState = -1;
 		}
 		if (this.isInside) {
@@ -149,7 +190,7 @@ var Tab = {
 
 	dragMoveTo: function (pageX, pageY) {
 		if (!this.dragging) return;
-		if (this.targetId !== roomInfo.viewer.viewer_id) return;
+		if (this.targetId !== localSession.get(roomInfo.room.id)) return;
 		var movedAmountX = pageX - this.startX;
 		var movedAmountY = pageY - this.startY;
 		if (!this.tabMoving) {
@@ -293,7 +334,7 @@ var ViewerIcon = {
 		this.markFrame.remove();
 		
 		if (this.frameState !== -1) {
-			editorList.setLayout(this.$target.data('viewer-id'), this.frameState);
+			UIEvent.fire('switch-editor-layout', this.$target.data('viewer-id'), this.frameState);
 			this.frameState = -1;
 		}
 		// アイコンクリック
@@ -304,7 +345,7 @@ var ViewerIcon = {
 			  movedAmountX >  threshold ||
 			  movedAmountY < -threshold ||
 			  movedAmountY >  threshold)) {
-			editorList.setLayout(this.$target.data('viewer-id'), 4);
+			UIEvent.fire('switch-editor-layout', this.$target.data('viewer-id'), 4);
 		}
 	},
 
@@ -389,14 +430,14 @@ var ViewerIcon = {
 }
 
 function isSelf(e) {
-	return $(e.target).parents('.editor-root').attr('id') === viewer.getSelfId();
+	return $(e.target).parents('.editor-root').attr('id') === localSession.get(roomInfo.room.id);
 }
 
 
 // サイドバー移動時の横幅変更処理登録
 SidebarHandle.setCallback(function () {
 	var editorRegion = $('#editor-region');
-	editorList.resize(editorRegion.width(), editorRegion.height());
+	UIEvent.fire('editor-resize', editorRegion.width(), editorRegion.height());
 });
 
 
@@ -407,7 +448,7 @@ $(document).on('mousedown', '.sidebar-handle', function (e) {
 }).on('mousedown', '.tab-item', function (e) {
 	// タブ削除
 	if (isSelf(e) && $(this).find('.close')[0] === e.target) {
-		editorList.get($(this).parents('.editor-root').attr('id')).removeTab($(this).data('tab-id'));
+		UIEvent.fire('remove-tab', $(this).parents('.editor-root').attr('id'), $(this).data('tab-id'));
 	
 	} else {
 		Tab.dragStart(e.pageX, e.pageY, this);

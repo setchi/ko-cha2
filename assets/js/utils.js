@@ -81,5 +81,27 @@ var Utils = {
 		setTimeout(function () {
 			if (!rendered) callback();
 		}, 600);
+	},
+
+
+	/**
+	 * ArrayBufferの内容を文字列に変換する
+	 * @param  {ArrayBuffer} arrayBuffer
+	 * @return {String} 文字列
+	 */
+	arrayBufferToString: function (arrayBuffer) {
+		var array = new Uint8Array(arrayBuffer);
+
+		// ArrayBufferを適切なViewで処理 (様々な文字コードに対応させる)
+		switch (Encoding.detect(array)) {
+		case 'UTF16':
+			array = new Uint16Array(arrayBuffer);
+			break;
+		case 'UTF32':
+			array = new Uint32Array(arrayBuffer);
+			break;
+		}
+		array = Encoding.convert(array, 'UNICODE');
+		return Encoding.codeToString(array);
 	}
 }

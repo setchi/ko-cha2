@@ -81,8 +81,7 @@
 				<span class="login-btn-facebook" data-sns="facebook"></span>
 			</div>
 		</div>
-		<div class="chat_log">
-		</div>
+		<div class="chat_log"></div>
 	</div>
 	<div class="sidebar-handle ui-draggable" style="left: 258px;"><span>||</span></div>
 
@@ -121,7 +120,7 @@
 	echo Asset::js('lib/jquery.min.js');
 	echo Asset::js('lib/bootstrap.min.js');
 	echo Asset::js('lib/encoding.min.js');
-/*
+//*
 	echo Asset::js('lib/jquery.fancybox.pack.js');
 	echo Asset::js('lib/contextmenu.min.js');
 	echo Asset::js('lib/toastr.min.js');
@@ -133,10 +132,10 @@
 	echo Asset::js('editor.js');
 	echo Asset::js('editor-list.js');
 	echo Asset::js('connection.js');
-	echo Asset::js('ui.js');
 	echo Asset::js('filedrop.js');
 	echo Asset::js('chat.js');
-	echo Asset::js('update.js');
+	echo Asset::js('ui.js');
+	echo Asset::js('main.js');
 	echo Asset::js('sdk/sdk.js');
 /*/
 	Casset::js('lib/jquery.fancybox.pack.js');
@@ -150,10 +149,10 @@
 	Casset::js('editor.js');
 	Casset::js('editor-list.js');
 	Casset::js('connection.js');
-	Casset::js('ui.js');
 	Casset::js('filedrop.js');
 	Casset::js('chat.js');
-	Casset::js('update.js');
+	Casset::js('ui.js');
+	Casset::js('main.js');
 	Casset::js('sdk/sdk.js');
 	echo Casset::render_js();
 //*/
