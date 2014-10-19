@@ -136,11 +136,11 @@ EditorList.prototype = {
 
 		if (!this.get(data.viewerId).isViewing()) {
 			// 閲覧中じゃないユーザーが更新した
-			$('.viewer-list').find('[data-viewer-id="' + data.viewerId + '"]').addClass('reception');
+			this.get(data.viewerId).setFlashing(true);
 		}
 		if (this.get(data.viewerId).currentTabId !== data.tabId) {
 			// 見ていないタブが更新された
-			$('#' + data.viewerId).find('[data-tab-id="' + data.tabId + '"]').addClass('reception');
+			this.get(data.viewerId).get(data.tabId).setFlashing(true);
 		}
 	},
 

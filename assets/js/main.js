@@ -17,7 +17,7 @@ var connection = new Connection();
 
 
 	/**
-	 * 通信に関するイベント
+	 * 通信に関するイベント登録
 	 */
 
 	// 接続準備完了時
@@ -92,7 +92,7 @@ var connection = new Connection();
 
 
 	/**
-	 * UIの操作に関するイベント
+	 * UIの操作に関するイベント登録
 	 */
 
 	// 表示タブを切り替えた

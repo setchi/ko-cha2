@@ -292,7 +292,7 @@ Editor.prototype = {
 	show: function () {
 		this.viewing = true;
 		this.$root.removeClass('hidden');
-		$('.viewer-list').find('[data-viewer-id="' + this.viewerId + '"]').removeClass('reception');
+		this.setFlashing(false);
 		return this;
 	},
 
@@ -337,15 +337,26 @@ Editor.prototype = {
 			return;
 		}
 		var $target = $('#' + this.viewerId);
-		$target.find('.tab-item').removeClass('active').filter('[data-tab-id="' + tabId + '"]').addClass('active').removeClass('reception');
+		$target.find('.tab-item').removeClass('active').filter('[data-tab-id="' + tabId + '"]').addClass('active');
 
 		for (var name in this.tabList) {
 			this.tabList[name].hide();
 		}
-		this.tabList[tabId].show().resize();
+		this.tabList[tabId].show().setFlashing(false).resize();
 		this.currentTabId = tabId;
 		$(window).resize();
 		return this.tabList[tabId];
+	},
+
+
+	/**
+	 * アイコンを点滅させる
+	 * @param {Boolean} flashing
+	 * @return {Editor} self
+	 */
+	setFlashing: function (flashing) {
+		$('.viewer-list').find('[data-viewer-id="' + this.viewerId + '"]')[flashing ? 'addClass' : 'removeClass']('flashing');
+		return this;
 	},
 
 

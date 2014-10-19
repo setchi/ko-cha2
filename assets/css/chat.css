@@ -73,40 +73,40 @@ header.navbar {
 	opacity: 0.3;
 }
 
-.viewer-list li.active-viewer.reception {
+.viewer-list li.active-viewer.flashing {
 	box-shadow: 1px 1px 2px 0px #0f0;
-	-webkit-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
-	-moz-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
-	-ms-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
-	-o-animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
-	animation: icon-reception 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
+	-webkit-animation: icon-flashing 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
+	-moz-animation: icon-flashing 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
+	-ms-animation: icon-flashing 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
+	-o-animation: icon-flashing 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
+	animation: icon-flashing 0.5s cubic-bezier(0.1, 1, 0.5, 1) 0 infinite alternate;
 }
 
 .viewer-list li.active-viewer {
 	opacity: 1;
 }
 
-@-webkit-keyframes icon-reception {
+@-webkit-keyframes icon-flashing {
 	0% { opacity: 0; }
 	100% {}
 }
 
-@-moz-keyframes icon-reception {
+@-moz-keyframes icon-flashing {
 	0% { opacity: 0; }
 	100% {}
 }
 
-@-ms-keyframes icon-reception {
+@-ms-keyframes icon-flashing {
 	0% { opacity: 0; }
 	100% {}
 }
 
-@-o-keyframes icon-reception {
+@-o-keyframes icon-flashing {
 	0% { opacity: 0; }
 	100% {}
 }
 
-@keyframes icon-reception {
+@keyframes icon-flashing {
 	0% { opacity: 0; }
 	100% {}
 }
@@ -264,44 +264,44 @@ header .viewer-list .active {
 	-moz-transition: left 0.5s cubic-bezier(0, 1, 0.5, 1) 0;
 }
 
-.tab-item.reception {
+.tab-item.flashing {
 	border-top: 2px solid #1a6eff;
-	-webkit-animation: tab-reception 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
-	-moz-animation: tab-reception 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
-	-ms-animation: tab-reception 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
-	-o-animation: tab-reception 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
-	animation: tab-reception 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
+	-webkit-animation: tab-flashing 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
+	-moz-animation: tab-flashing 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
+	-ms-animation: tab-flashing 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
+	-o-animation: tab-flashing 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
+	animation: tab-flashing 0.6s cubic-bezier(0.3, 1, 0.5, 1) 0 infinite alternate;
 }
 
-@-webkit-keyframes tab-reception {
+@-webkit-keyframes tab-flashing {
 	0% { background-color: rgba(26, 110, 204, 0.1); }
 	30% { background-color: rgba(26, 110, 204, 0.6); }
 	31% {}
 	100% {}
 }
 
-@-moz-keyframes tab-reception {
+@-moz-keyframes tab-flashing {
 	0% { background-color: rgba(26, 110, 204, 0.1); }
 	30% { background-color: rgba(26, 110, 204, 0.6); }
 	31% {}
 	100% {}
 }
 
-@-ms-keyframes tab-reception {
+@-ms-keyframes tab-flashing {
 	0% { background-color: rgba(26, 110, 204, 0.1); }
 	30% { background-color: rgba(26, 110, 204, 0.6); }
 	31% {}
 	100% {}
 }
 
-@-o-keyframes tab-reception {
+@-o-keyframes tab-flashing {
 	0% { background-color: rgba(26, 110, 204, 0.1); }
 	30% { background-color: rgba(26, 110, 204, 0.6); }
 	31% {}
 	100% {}
 }
 
-@keyframes tab-reception {
+@keyframes tab-flashing {
 	0% { background-color: rgba(26, 110, 204, 0.1); }
 	30% { background-color: rgba(26, 110, 204, 0.6); }
 	31% {}

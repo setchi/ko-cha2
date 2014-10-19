@@ -373,6 +373,17 @@ Tab.prototype = {
 
 
 	/**
+	 * タブを点滅させる
+	 * @param {Boolean} flashing
+	 * @return {Tab} self
+	 */
+	setFlashing: function (flashing) {
+		$('#' + this._viewerId).find('[data-tab-id="' + this._tabId + '"]')[flashing ? 'addClass' : 'removeClass']('flashing');
+		return this;
+	},
+
+
+	/**
 	 * エディタのテキストをURIencodeして取得(送信用)
 	 * @return {String} 送信用テキスト
 	 */
