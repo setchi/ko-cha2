@@ -23,7 +23,7 @@ var Tab = function (viewerId, tabId, tabName) {
 	 * タブID
 	 * @type {String}
 	 */
-	this._tabId = tabId;
+	this.id = tabId;
 
 
 	/**
@@ -132,7 +132,7 @@ var Tab = function (viewerId, tabId, tabName) {
 		 */
 		tabname: function (tabName) {
 			_self.tabName = tabName;
-			var $tabLabel = $('#' + _self._viewerId).find('.tab-list').find('[data-tab-id="' + _self._tabId + '"] > .label');
+			var $tabLabel = $('#' + _self._viewerId).find('.tab-list').find('[data-tab-id="' + _self.id + '"] > .label');
 			$tabLabel.text(decodeURIComponent(tabName));
 		},
 
@@ -240,7 +240,7 @@ Tab.prototype = {
 		// TODO: この中をもっと整える
 		var tmpData = {
 			viewerId: this._viewerId,
-			tabId: this._tabId,
+			tabId: this.id,
 			tabName: encodeURIComponent(this.tabName),
 			data: data
 		};
@@ -300,7 +300,7 @@ Tab.prototype = {
 			type: 'editor_change_text',
 			data: JSON.stringify({
 				viewerId: this._viewerId,
-				tabId: this._tabId,
+				tabId: this.id,
 				tabName: encodeURIComponent(this.tabName),
 				data: data
 			})
@@ -378,7 +378,7 @@ Tab.prototype = {
 	 * @return {Tab} self
 	 */
 	setFlashing: function (flashing) {
-		$('#' + this._viewerId).find('[data-tab-id="' + this._tabId + '"]')[flashing ? 'addClass' : 'removeClass']('flashing');
+		$('#' + this._viewerId).find('[data-tab-id="' + this.id + '"]')[flashing ? 'addClass' : 'removeClass']('flashing');
 		return this;
 	},
 

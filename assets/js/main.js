@@ -142,6 +142,6 @@ var connection = new Connection();
 		if (!targetEditor.isViewing()) {
 			editorList.setLayout(localSession.get(roomInfo.room.id), 4);
 		}
-		targetEditor.changeActiveTab(file.name);
+		targetEditor.changeActiveTab(targetTab.id);
 	});
 }());

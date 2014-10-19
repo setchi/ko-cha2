@@ -154,7 +154,6 @@ Viewer.prototype = {
 			roomInfo.viewer.image = imageUrl;
 		}
 
-		console.log('_applyIcon');
 		this.viewerInfoList[viewerId].image = imageUrl;
 		$('#' + viewerId + ' .editor-user-icon, .' + viewerId).css('background-image', 'url(' + imageUrl + ')');
 	}
