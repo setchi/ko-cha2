@@ -382,5 +382,19 @@ Editor.prototype = {
 		this.send(true);
 		toastr.info('サーバーに保存しました。');
 		return this;
+	},
+
+
+	/**
+	 * エディタの状態をまとめた送信用オブジェクトを生成
+	 * @return {Object} 送信用オブジェクト
+	 */
+	serialize: function () {
+		var res = [];
+
+		for (var tabName in this.tabList) {
+			res.push(this.tabList[tabName].serialize());
+		}
+		return res;
 	}
 }

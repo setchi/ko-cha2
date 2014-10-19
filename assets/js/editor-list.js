@@ -198,5 +198,20 @@ EditorList.prototype = {
 				}
 			}
 		}
+	},
+
+
+	/**
+	 * 相手に全Viewerの状態を送信する
+	 * @param  {DataConnection} conn
+	 */
+	send: function (conn) {
+		for (var viewerId in this.editorList) {
+			var sendDataList = this.editorList[viewerId].serialize();
+
+			for (var i in sendDataList) {
+				conn.send(sendDataList[i]);
+			}
+		}
 	}
 }

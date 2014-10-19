@@ -289,6 +289,34 @@ Tab.prototype = {
 
 
 	/**
+	 * タブの状態をまとめた送信用オブジェクト生成
+	 * @return {Object} 送信用オブジェクト
+	 */
+	serialize: function () {
+		var data = this.getState();
+		data.text = this.getText();
+
+		var editorData = {
+			type: 'editor_change_text',
+			data: JSON.stringify({
+				viewerId: this._viewerId,
+				tabId: this._tabId,
+				tabName: encodeURIComponent(this.tabName),
+				data: data
+			})
+		};
+
+		var sendData = {};
+		sendData.updated = true;
+		sendData[editorData.type] = {
+			type: '',
+			data: [editorData]
+		};
+		return sendData;
+	},
+
+
+	/**
 	 * ドロップされたファイルの更新日時を監視。外部で更新されたらエディタに反映。
 	 * @param {File} file
 	 */
@@ -354,8 +382,8 @@ Tab.prototype = {
 
 
 	/**
-	 * エディタの状態をまとめた送信用オブジェクト生成
-	 * @return {Object} 送信用データ
+	 * エディタの状態をまとめたオブジェクト生成
+	 * @return {Object}
 	 */
 	getState: function () {
 		return {

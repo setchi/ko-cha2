@@ -86,7 +86,7 @@ var Chat = {
 
 
 	/**
-	 * 受信データをチャとログに反映する
+	 * 受信データをチャットログに反映する
 	 * @param  {Object} logs      受信したログのリスト
 	 * @param  {Boolean} selfEnter 自身の発言による挿入か
 	 */
