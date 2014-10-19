@@ -147,10 +147,10 @@ Connection.prototype = {
 
 
 	/**
-	 * Peer接続のオファーを受信
+	 * 相手とDataConnectionを確立する
 	 * @param  {String} peerId
 	 */
-	onOffer: (function () {
+	connect: (function () {
 		var num = 0;
 
 		return function (peerId) {

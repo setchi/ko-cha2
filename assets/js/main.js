@@ -4,9 +4,9 @@ var connection = new Connection();
 	var editorList = new EditorList();
 	var viewer = new Viewer();
 
-	// 相手からPeerの接続要求が来た時
+	// 相手から接続要求が来た時
 	viewer.on('on-offer', function (peerId) {
-		connection.onOffer(peerId);
+		connection.connect(peerId);
 	});
 
 
