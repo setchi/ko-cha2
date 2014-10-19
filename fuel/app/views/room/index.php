@@ -120,7 +120,7 @@
 	echo Asset::js('lib/jquery.min.js');
 	echo Asset::js('lib/bootstrap.min.js');
 	echo Asset::js('lib/encoding.min.js');
-//*
+/*
 	echo Asset::js('lib/jquery.fancybox.pack.js');
 	echo Asset::js('lib/contextmenu.min.js');
 	echo Asset::js('lib/toastr.min.js');
