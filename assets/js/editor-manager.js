@@ -24,16 +24,15 @@ EditorManager.prototype = {
 			var tabId = $(this).data('tab-id');
 			targetTab = _self.get(viewerId).changeActiveTab(tabId);
 
-			if (targetTab.isSelf) {
-				var currentState = targetTab.getState();
-				// 現在値を代入
-				$('#inputTabName').val(decodeURIComponent(targetTab.tabName));
-				$('#selectMode').val(currentState.mode);
-				$('#selectTheme').val(currentState.theme);
-				$('#selectFontSize').val(currentState.fontsize);
-			} else {
+			if (!targetTab.isSelf) {
 				return Utils.cancelEvent(e);
 			}
+			var currentState = targetTab.getState();
+			// 現在値を代入
+			$('#inputTabName').val(decodeURIComponent(targetTab.tabName));
+			$('#selectMode').val(currentState.mode);
+			$('#selectTheme').val(currentState.theme);
+			$('#selectFontSize').val(currentState.fontsize);
 
 		// 言語変更
 		}).on('change', '#selectMode', function (e) {
@@ -177,8 +176,8 @@ EditorManager.prototype = {
 		}
 
 		var pairPosition = [1, 0, 3, 2, -1];
-		var _self = this;
 		var $editors = this.editorList[viewerId].$editorRegion.find('.editor-root');
+		var _self = this;
 
 		if ($editors.eq(0).attr('id') !== viewerId) {
 			$editors.not(':first').each(function () {
@@ -188,14 +187,15 @@ EditorManager.prototype = {
 		// ターゲットをeditorRegionの一番上に移動する
 		this.editorList[viewerId].$root.prependTo(this.editorList[viewerId].$editorRegion);
 		this.editorList[viewerId].show().setPosition(state).tabResize();
+
 		for (var id in this.editorList) {
-			// 相手
-			if (this.editorList[id].isViewing() && id !== viewerId) {
-				if (pairPosition[state] === -1) {
-					this.editorList[id].hide();
-				} else {
-					this.editorList[id].show().setPosition(pairPosition[state]);
-				}
+			if (!this.editorList[id].isViewing() || id === viewerId) {
+				continue;
+			}
+			if (pairPosition[state] === -1) {
+				this.editorList[id].hide();
+			} else {
+				this.editorList[id].show().setPosition(pairPosition[state]);
 			}
 		}
 	},

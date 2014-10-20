@@ -330,17 +330,17 @@ Tab.prototype = {
 		clearInterval(this._FILE_MONITOR_INTERVAL);
 
 		this._FILE_MONITOR_INTERVAL = setInterval(function () {
-			if (this._fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
-				this._fileLastMod = file.lastModifiedDate;
-				var reader = new FileReader();
-
-				reader.onload = function (e) {
-					this.applyData({
-						text: Utils.arrayBufferToString(e.target.result)
-					});
-				}.bind(this);
-				reader.readAsArrayBuffer(file);
+			if (this._fileLastMod.getTime() === file.lastModifiedDate.getTime()) {
+				return;
 			}
+			this._fileLastMod = file.lastModifiedDate;
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				this.applyData({
+					text: Utils.arrayBufferToString(e.target.result)
+				});
+			}.bind(this);
+			reader.readAsArrayBuffer(file);
 		}.bind(this), 1000);
 
 		return this;

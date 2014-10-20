@@ -213,7 +213,6 @@ EditorObject.prototype = {
 		var tabId = 0;
 		while (tabId in this.tabList) tabId++;
 
-		// エディタ生成
 		this.tabList[tabId] = new Tab(this.viewerId, tabId, tabName).hide();
 		if (Utils.getSize(this.tabList) === 1) {
 			this.changeActiveTab(tabId);
