@@ -131,9 +131,10 @@ var Tab = function (viewerId, tabId, tabName) {
 		 * @param  {String} tabName
 		 */
 		tabname: function (tabName) {
+			if (_self.tabName === tabName) return;
+			
 			_self.tabName = tabName;
-			var $tabLabel = $('#' + _self._viewerId).find('.tab-list').find('[data-tab-id="' + _self.id + '"] > .label');
-			$tabLabel.text(decodeURIComponent(tabName));
+			_self.$tabLabel.text(decodeURIComponent(tabName));
 		},
 
 
@@ -187,6 +188,7 @@ Tab.prototype = {
 		// data属性がうまく反映されず、テンプレート化いったん断念
 		$(Utils.sprintf(editorText, this._aceId, tabId)).width(editorRegion.width()).height(editorRegion.height() - 37).appendTo($root.find('.editor-list:first'));
 		$(Utils.sprintf(tabItemText, tabId, tabName, tabId)).appendTo($root.find('.tab-list'));
+		this.$tabLabel = $root.find('.tab-list').find('[data-tab-id="' + this.id + '"] > .label');
 	},
 
 
