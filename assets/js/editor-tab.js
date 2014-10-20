@@ -64,7 +64,7 @@ var Tab = function (viewerId, tabId, tabName) {
 	 * ファイルの更新日時監視タイマー
 	 * @type {Number}
 	 */
-	this._fileMonitorTimer = null;
+	this._FILE_MONITOR_INTERVAL = null;
 
 
 	/**
@@ -325,9 +325,9 @@ Tab.prototype = {
 	 */
 	startMonitoringFile: function (file) {
 		this._fileLastMod = file.lastModifiedDate;
-		clearInterval(this._fileMonitorTimer);
+		clearInterval(this._FILE_MONITOR_INTERVAL);
 
-		this._fileMonitorTimer = setInterval(function () {
+		this._FILE_MONITOR_INTERVAL = setInterval(function () {
 			if (this._fileLastMod.getTime() !== file.lastModifiedDate.getTime()) {
 				this._fileLastMod = file.lastModifiedDate;
 				var reader = new FileReader();
@@ -438,7 +438,7 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	remove: function () {
-		clearInterval(this._fileMonitorTimer);
+		clearInterval(this._FILE_MONITOR_INTERVAL);
 		this.ace.destroy();
 		
 		if (this.isSelf) {

@@ -51,7 +51,7 @@ var Chat = {
 				message = $(this).val();
 
 			if (eCode !== 13 || !message) return;
-			_self._send(message);
+			_self.send(message);
 			$(this).val('');
 		});
 
@@ -60,7 +60,7 @@ var Chat = {
 		 * 発言する
 		 * @param  {String} message
 		 */
-		this._send = function (message) {
+		this.send = function (message) {
 			var data = roomInfo.viewer;
 			data['message'] = encodeURIComponent(message);
 			this.update([data], true);
