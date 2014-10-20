@@ -1,8 +1,3 @@
-/**
- * ファイルドロップに関する処理
- */
-
-$(function () {
 
 /**
  * ファイル拡張子と言語モードを関連付けるモジュール
@@ -187,9 +182,16 @@ var modelist = (function() {
 
 
 /**
+ * ファイルドロップに関する処理
+ */
+
+$(function () {
+
+
+/**
  * ファイルをアップロードする
- * @param	{File}	 file
- * @param	{Function} callback
+ * @param {File}	 file
+ * @param {Function} callback
  */
 function uploadFile (file, callback) {
 	var uploadData = new FormData();
@@ -208,7 +210,7 @@ function uploadFile (file, callback) {
 
 /**
  * ファイルの内容を読込む
- * @param	{File} file
+ * @param {File} file
  */
 function readFile (file) {
 	if(!window.FileReader) {
@@ -231,7 +233,7 @@ function readFile (file) {
 
 /**
  * ファイルドロップ時のハンドラ
- * @param	{Object} e
+ * @param {Object} e
  * @return {Boolean} イベントキャンセル
  */
 function handleDroppedFile (e) {

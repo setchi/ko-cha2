@@ -198,7 +198,7 @@ Tab.prototype = {
 		this.ace.setAnimatedScroll(true);
 		this.applyData({
 			theme: 'cobalt',
-			mode: 'c_cpp',
+			mode: 'text',
 			fontsize: 12
 		});
 		this.isSelf ? this._initSelf() : this.ace.setReadOnly(true);
@@ -421,6 +421,11 @@ Tab.prototype = {
 	 * @return {Tab} 自身
 	 */
 	applyData: function (data) {
+		// textだったら言語モード再取得. 言語モードが正しく反映されない問題の仮対応. 
+		if (data.mode === 'text') {
+			data.mode = modelist.getModeForPath(data.tabname || this.tabName).name;
+		}
+
 		// 入ってきたプロパティだけ反映する
 		for (var prop in data) if (data.hasOwnProperty(prop)) {
 			if (prop in this._update) {
