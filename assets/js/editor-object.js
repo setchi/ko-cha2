@@ -93,7 +93,7 @@ EditorObject.prototype = {
 				if (timer !== -1) {
 					clearTimeout(timer);
 					timer = -1;
-					_self.addEmptyTab();
+					_self.addTab('untitled').send();
 				} else {
 					timer = setTimeout(function() {
 						timer = -1;
@@ -224,20 +224,6 @@ EditorObject.prototype = {
 
 
 	/**
-	 * 空タブを生成する
-	 */
-	addEmptyTab: function () {
-		var  tabId = this.tabList.length;
-
-		this.addTab('untitled').applyData({
-			mode: 'c_cpp'
-		}).send({
-			mode: 'c_cpp'
-		});
-	},
-
-
-	/**
 	 * タブをリサイズする
 	 */
 	tabResize: (function () {
@@ -342,7 +328,7 @@ EditorObject.prototype = {
 		for (var name in this.tabList) {
 			this.tabList[name].hide();
 		}
-		this.tabList[tabId].show().setFlashing(false).resize();
+		this.tabList[tabId].setFlashing(false).show().resize().ace.focus();
 		this.currentTabId = tabId;
 		$(window).resize();
 		return this.tabList[tabId];

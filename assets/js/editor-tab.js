@@ -223,7 +223,7 @@ Tab.prototype = {
 				clearTimeout(timer);
 				timer = setTimeout(function () {
 					_self._sendData('state', _self.getState());
-				}, 100);
+				}, 10);
 			}
 		}());
 		this.ace.session.on('changeScrollLeft', sendState);
