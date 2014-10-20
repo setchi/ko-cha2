@@ -215,7 +215,17 @@ Tab.prototype = {
 			'insertLines',
 			'removeLines'
 		];
-		var sendState = function () {this._sendData('state', this.getState())}.bind(this);
+		var _self = this;
+		var sendState = (function () {
+			var timer = null;
+
+			return function () {
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					_self._sendData('state', _self.getState());
+				}, 100);
+			}
+		}());
 		this.ace.session.on('changeScrollLeft', sendState);
 		this.ace.session.on('changeScrollTop', sendState);
 		this.ace.session.selection.on('changeSelection', sendState);
@@ -296,23 +306,16 @@ Tab.prototype = {
 		var data = this.getState();
 		data.text = this.getText();
 
-		var editorData = {
-			type: 'editor_change_text',
-			data: JSON.stringify({
+		return {
+			"viewer_id": this._viewerId,
+			"tab_id": this.id,
+			"data": JSON.stringify({
 				viewerId: this._viewerId,
 				tabId: this.id,
 				tabName: encodeURIComponent(this.tabName),
 				data: data
 			})
 		};
-
-		var sendData = {};
-		sendData.updated = true;
-		sendData[editorData.type] = {
-			type: '',
-			data: [editorData]
-		};
-		return sendData;
 	},
 
 

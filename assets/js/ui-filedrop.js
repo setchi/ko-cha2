@@ -183,7 +183,6 @@ var modelist = (function() {
 		modes: modes,
 		modesByName: modesByName
 	};
-
 })();
 
 

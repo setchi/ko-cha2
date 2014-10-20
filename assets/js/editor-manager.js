@@ -202,16 +202,15 @@ EditorManager.prototype = {
 
 
 	/**
-	 * 相手に全Viewerの状態を送信する
-	 * @param  {DataConnection} conn
+	 * 全Viewerのエディタの状態をまとめたオブジェクト生成
+	 * @return {Object} 送信用オブジェクト
 	 */
-	send: function (conn) {
-		for (var viewerId in this.editorList) {
-			var sendDataList = this.editorList[viewerId].serialize();
+	serializeAll: function () {
+		var res = [];
 
-			for (var i in sendDataList) {
-				conn.send(sendDataList[i]);
-			}
+		for (var viewerId in this.editorList) {
+			res = res.concat(this.editorList[viewerId].serialize());
 		}
+		return res;
 	}
 }

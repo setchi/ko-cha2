@@ -33,12 +33,14 @@ var connection = new Connection();
 
 		// 相手が最初に接続成功したのが自分の場合、部屋のすべての状態を送信する
 		if (!viewer.isActive(conn.metadata.viewerId) && conn.metadata.num === 0) {
-
-			// チャット履歴送信
-			conn.send({ updated: true, chat_log: Chat.getHistory() });
-
-			// 全Viewerのエディタの状態を送信
-			editorManager.send(conn);
+			conn.send({
+				updated: true,
+				chat_log: Chat.getHistory(),
+				editor_change_text: {
+					type: 'text',
+					data: editorManager.serializeAll()
+				}
+			});
 		}
 		viewer.setActive(conn.metadata.viewerId, true);
 	});
