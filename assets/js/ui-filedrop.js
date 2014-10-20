@@ -5,84 +5,192 @@
 $(function () {
 
 /**
- * 拡張子から言語を取得
- * @param  {String} ext - 拡張子
- * @return {String} 該当言語
+ * ファイル拡張子と言語モードを関連付けるモジュール
  */
-function getModeByExt (ext) {
+var modelist = (function() {
+
+	"use strict";
+
+	var modes = [];
+
+	/**
+	 * ファイルのパスから言語モードを取得
+	 * @param  {String} path
+	 * @return {Object} 言語モードに関する情報
+	 */
+	function getModeForPath(path) {
+		var mode = modesByName.text;
+		var fileName = path.split(/[\/\\]/).pop();
+		for (var i = 0; i < modes.length; i++) {
+			if (modes[i].supportsFile(fileName)) {
+				mode = modes[i];
+				break;
+			}
+		}
+		return mode;
+	}
+
+	var Mode = function(name, caption, extensions) {
+		this.name = name;
+		this.caption = caption;
+		this.mode = "ace/mode/" + name;
+		this.extensions = extensions;
+		if (/\^/.test(extensions)) {
+			var re = extensions.replace(/\|(\^)?/g, function(a, b){
+				return "$|" + (b ? "^" : "^.*\\.");
+			}) + "$";
+		} else {
+			var re = "^.*\\.(" + extensions + ")$";
+		}
+
+		this.extRe = new RegExp(re, "gi");
+	};
+
+	Mode.prototype.supportsFile = function(filename) {
+		return filename.match(this.extRe);
+	};
+
+	var supportedModes = {
+		ABAP:        ["abap"],
+		ActionScript:["as"],
+		ADA:         ["ada|adb"],
+		Apache_Conf: ["^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd"],
+		AsciiDoc:    ["asciidoc"],
+		Assembly_x86:["asm"],
+		AutoHotKey:  ["ahk"],
+		BatchFile:   ["bat|cmd"],
+		C9Search:    ["c9search_results"],
+		C_Cpp:       ["cpp|c|cc|cxx|h|hh|hpp"],
+		Cirru:       ["cirru|cr"],
+		Clojure:     ["clj"],
+		Cobol:       ["CBL|COB"],
+		coffee:      ["coffee|cf|cson|^Cakefile"],
+		ColdFusion:  ["cfm"],
+		CSharp:      ["cs"],
+		CSS:         ["css"],
+		Curly:       ["curly"],
+		D:           ["d|di"],
+		Dart:        ["dart"],
+		Diff:        ["diff|patch"],
+		Dot:         ["dot"],
+		Erlang:      ["erl|hrl"],
+		EJS:         ["ejs"],
+		Forth:       ["frt|fs|ldr"],
+		FTL:         ["ftl"],
+		Gherkin:     ["feature"],
+		Glsl:        ["glsl|frag|vert"],
+		golang:      ["go"],
+		Groovy:      ["groovy"],
+		HAML:        ["haml"],
+		Handlebars:  ["hbs|handlebars|tpl|mustache"],
+		Haskell:     ["hs"],
+		haXe:        ["hx"],
+		HTML:        ["html|htm|xhtml"],
+		HTML_Ruby:   ["erb|rhtml|html.erb"],
+		INI:         ["ini|conf|cfg|prefs"],
+		Jack:        ["jack"],
+		Jade:        ["jade"],
+		Java:        ["java"],
+		JavaScript:  ["js|jsm"],
+		JSON:        ["json"],
+		JSONiq:      ["jq"],
+		JSP:         ["jsp"],
+		JSX:         ["jsx"],
+		Julia:       ["jl"],
+		LaTeX:       ["tex|latex|ltx|bib"],
+		LESS:        ["less"],
+		Liquid:      ["liquid"],
+		Lisp:        ["lisp"],
+		LiveScript:  ["ls"],
+		LogiQL:      ["logic|lql"],
+		LSL:         ["lsl"],
+		Lua:         ["lua"],
+		LuaPage:     ["lp"],
+		Lucene:      ["lucene"],
+		Makefile:    ["^Makefile|^GNUmakefile|^makefile|^OCamlMakefile|make"],
+		MATLAB:      ["matlab"],
+		Markdown:    ["md|markdown"],
+		MEL:         ["mel"],
+		MySQL:       ["mysql"],
+		MUSHCode:    ["mc|mush"],
+		Nix:         ["nix"],
+		ObjectiveC:  ["m|mm"],
+		OCaml:       ["ml|mli"],
+		Pascal:      ["pas|p"],
+		Perl:        ["pl|pm"],
+		pgSQL:       ["pgsql"],
+		PHP:         ["php|phtml"],
+		Powershell:  ["ps1"],
+		Prolog:      ["plg|prolog"],
+		Properties:  ["properties"],
+		Protobuf:    ["proto"],
+		Python:      ["py"],
+		R:           ["r"],
+		RDoc:        ["Rd"],
+		RHTML:       ["Rhtml"],
+		Ruby:        ["rb|ru|gemspec|rake|^Guardfile|^Rakefile|^Gemfile"],
+		Rust:        ["rs"],
+		SASS:        ["sass"],
+		SCAD:        ["scad"],
+		Scala:       ["scala"],
+		Smarty:      ["smarty|tpl"],
+		Scheme:      ["scm|rkt"],
+		SCSS:        ["scss"],
+		SH:          ["sh|bash|^.bashrc"],
+		SJS:         ["sjs"],
+		Space:       ["space"],
+		snippets:    ["snippets"],
+		Soy_Template:["soy"],
+		SQL:         ["sql"],
+		Stylus:      ["styl|stylus"],
+		SVG:         ["svg"],
+		Tcl:         ["tcl"],
+		Tex:         ["tex"],
+		Text:        ["txt"],
+		Textile:     ["textile"],
+		Toml:        ["toml"],
+		Twig:        ["twig"],
+		Typescript:  ["ts|typescript|str"],
+		VBScript:    ["vbs"],
+		Velocity:    ["vm"],
+		Verilog:     ["v|vh|sv|svh"],
+		XML:         ["xml|rdf|rss|wsdl|xslt|atom|mathml|mml|xul|xbl"],
+		XQuery:      ["xq"],
+		YAML:        ["yaml|yml"]
+	};
+
+	var nameOverrides = {
+		ObjectiveC: "Objective-C",
+		CSharp: "C#",
+		golang: "Go",
+		C_Cpp: "C/C++",
+		coffee: "CoffeeScript",
+		HTML_Ruby: "HTML (Ruby)",
+		FTL: "FreeMarker"
+	};
+	var modesByName = {};
+	for (var name in supportedModes) {
+		var data = supportedModes[name];
+		var displayName = (nameOverrides[name] || name).replace(/_/g, " ");
+		var filename = name.toLowerCase();
+		var mode = new Mode(filename, displayName, data[0]);
+		modesByName[filename] = mode;
+		modes.push(mode);
+	}
+
 	return {
-		'abp': 'abap',
-		'as': 'actionscript',
-		'c': 'c_cpp',
-		'h': 'c_cpp',
-		'cpp': 'c_cpp',
-		'hpp': 'c_cpp',
-		'cobol': 'cobol',
-		'coffee': 'coffee',
-		'cs': 'csharp',
-		'css': 'css',
-		'clj': 'clojure',
-		'd': 'd',
-		'dart': 'dart',
-		'erl': 'erlang',
-		'forth': 'forth',
-		'go': 'golang',
-		'groovy': 'groovy',
-		'hs': 'haskell',
-		'lhs': 'haskell',
-		'hx': 'haxe',
-		'html': 'html',
-		'htm': 'html',
-		'xhtml': 'html',
-		'svg': 'html',
-		'java': 'java',
-		'js': 'javascript',
-		'jsx': 'jsx',
-		'lisp': 'lisp',
-		'lsl': 'lsl',
-		'lua': 'lua',
-		'mat': 'matlab',
-		'sql': 'mysql',
-		'm': 'objectivec',
-		'md': 'markdown',
-		'ml': 'ocaml',
-		'pas': 'pascal',
-		'pl': 'perl',
-		'php': 'php',
-		'pro': 'prolog',
-		'swi': 'prolog',
-		'py': 'python',
-		'r': 'r',
-		'rb': 'ruby',
-		'rs': 'rust',
-		'scala': 'scala',
-		'scm': 'scheme',
-		'sh': 'sh',
-		'tex': 'latex',
-		'ts': 'typescript',
-		'vbs': 'vbscript',
-		'v': 'verilog',
-		'asm': 'assembly_x86',
-		'xml': 'xml',
-		'xquery': 'xquery'
-	}[ext.toLocaleLowerCase()] || 'plain_text';
-}
+		getModeForPath: getModeForPath,
+		modes: modes,
+		modesByName: modesByName
+	};
 
-
-/**
- * ファイル名から言語を取得
- * @param  {String} fileName
- * @return {String} 該当言語
- */
-function getExtByFilename (fileName) {
-	return fileName.substr(fileName.lastIndexOf('.') + 1);
-}
+})();
 
 
 /**
  * ファイルをアップロードする
- * @param  {File}   file
- * @param  {Function} callback
+ * @param	{File}	 file
+ * @param	{Function} callback
  */
 function uploadFile (file, callback) {
 	var uploadData = new FormData();
@@ -100,22 +208,21 @@ function uploadFile (file, callback) {
 
 
 /**
- * ファイルの内容をエディタに適用する
- * @param  {File} file
+ * ファイルの内容を読込む
+ * @param	{File} file
  */
 function readFile (file) {
 	if(!window.FileReader) {
 		alert("File API がサポートされていません。");
 		return false;
 	}
-	var ext = getExtByFilename(file.name);
 	var fileReader = new FileReader();
 
 	fileReader.onload = function (e) {
 		UIEvent.fire(
 			'file-dropped',
 			file,
-			getModeByExt(ext),
+			modelist.getModeForPath(file.name).name,
 			Utils.arrayBufferToString(e.target.result)
 		);
 	}
@@ -125,7 +232,7 @@ function readFile (file) {
 
 /**
  * ファイルドロップ時のハンドラ
- * @param  {Object} e
+ * @param	{Object} e
  * @return {Boolean} イベントキャンセル
  */
 function handleDroppedFile (e) {
