@@ -425,3 +425,7 @@ header .viewer-list .active {
 	margin-left: 4px;
 	margin-top: 4px;
 }
+
+.context-menu-root {
+	width: 240px !important;
+}
