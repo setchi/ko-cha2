@@ -97,7 +97,7 @@ Connection.prototype = {
 		this._createPeerConnection();
 
 		// ページを離れるとき
-		window.addEventListener('onbeforeunload', this._disconnect.bind(this));
+		window.addEventListener('beforeunload', this._disconnect.bind(this));
 	},
 
 
