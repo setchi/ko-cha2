@@ -114,7 +114,7 @@
 	<li class="viewer-icon" data-viewer-id=""></li>
 
 </div>
-<script src="https://skyway.io/dist/0.3/peer.js"></script>
+<script src="https://skyway.io/dist/0.3/peer.min.js"></script>
 <?php
 	echo Asset::js('lib/src-min/ace.js');
 	echo Asset::js('lib/jquery.min.js');
