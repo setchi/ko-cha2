@@ -69,6 +69,26 @@ Connection.prototype = {
 
 
 	/**
+	 * 相手との接続が切れたときに呼び出される
+	 * @param  {DataConnection} conn
+	 */
+	_close: function (conn) {
+		this._fire('close', conn);
+		delete this._connectionList[conn.metadata.viewerId];
+	},
+
+
+	/**
+	 * 接続に関するエラーが発生したときに呼び出される
+	 * @param  {Error} e
+	 */
+	_error: function (e) {
+		this._fire('error', e);
+		console.warn(e.message);
+	},
+
+
+	/**
 	 * 初期化
 	 * @param  {Object} selfViewerInfo
 	 */
@@ -77,7 +97,7 @@ Connection.prototype = {
 		this._createPeerConnection();
 
 		// ページを離れるとき
-		window.onbeforeunload = this._disconnect.bind(this);
+		window.addEventListener('onbeforeunload', this._disconnect.bind(this));
 	},
 
 
@@ -107,11 +127,7 @@ Connection.prototype = {
 			this.send({
 				type: 'update_peer_id',
 				data: { 'peer_id': myPeerId }
-			})
-		}.bind(this));
-
-		this.peer.on('error', function (err) {
-			console.log(err);
+			});
 		}.bind(this));
 
 		this.peer.on('connection', function (conn) {
@@ -119,6 +135,8 @@ Connection.prototype = {
 			this._connectionList[conn.metadata.viewerId] = conn;
 			this._setupDataConnection(conn);
 		}.bind(this));
+
+		this.peer.on('error', this._error.bind(this));
 	},
 
 
@@ -131,18 +149,15 @@ Connection.prototype = {
 			this._fire('received', data);
 		}.bind(this));
 
-		conn.on('error', function (e) {
-			this._fire('error', e);
-		}.bind(this));
-
 		conn.on('open', function () {
 			this._fire('open', conn);
 		}.bind(this));
 
 		conn.on('close', function () {
-			this._fire('close', conn);
-			delete this._connectionList[conn.metadata.viewerId];
+			this._close(conn);
 		}.bind(this));
+
+		conn.on('error', this._error.bind(this));
 	},
 
 

@@ -51,6 +51,17 @@ var connection = new Connection();
 		viewer.setActive(conn.metadata.viewerId, false);
 	});
 
+
+	// 接続エラーが起きたとき
+	connection.on('error', function (e) {
+
+		switch (e.type) {
+		case 'browser-incompatible':
+			alert('ご利用のブラウザはWebRTCに対応していません。このアプリは、GoogleChromeなどのWebRTC対応ブラウザで利用してください。');
+			break;
+		}
+	});
+
 		
 	var commandList = {
 		removeTab: function (editorData) {
