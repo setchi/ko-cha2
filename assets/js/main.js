@@ -140,8 +140,8 @@ var connection = new Connection();
 
 	// ファイルがドロップされた
 	UIEvent.on('file-dropped', function (file, mode, content) {
-		var targetEditor = editorManager.get(localSession.get(roomInfo.room.id));
-		var targetTab = targetEditor.addTab(file.name);
+		var selfEditor = editorManager.get(localSession.get(roomInfo.room.id));
+		var targetTab = selfEditor.addTab(file.name);
 
 		// エディタに情報を反映、ファイルの更新監視開始
 		targetTab.startMonitoringFile(file).applyData({
@@ -152,9 +152,9 @@ var connection = new Connection();
 		});
 		
 		// 自分のエディタを開いていなければ表示
-		if (!targetEditor.isViewing()) {
+		if (!selfEditor.isViewing()) {
 			editorManager.setLayout(localSession.get(roomInfo.room.id), 4);
 		}
-		targetEditor.changeActiveTab(targetTab.id);
+		selfEditor.changeActiveTab(targetTab.id);
 	});
 }());
