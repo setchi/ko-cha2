@@ -179,7 +179,7 @@ class Controller_Chat extends Controller_Rest
 	 * @access public
 	 * @return JSON
 	 */
-	public function post_upload($room_id) {
+	public function post_upload_image($room_id) {
 		$path = DOCROOT.'assets/upload/'.$room_id.'/';
 
 		// ファイルを書き込み専用でオープンします。
@@ -215,6 +215,46 @@ class Controller_Chat extends Controller_Rest
 					->resize(130, null)
 					->rotate(-90)
 					->save_pa('thumb-');
+			}
+
+			return $this->response($name);
+		}
+		// エラー有り
+		foreach (Upload::get_errors() as $file) {
+			// $file['errors']の中にエラーが入っているのでそれを処理
+		}
+	}
+
+	/**
+	 * ファイルを受信します。
+	 * @access public
+	 * @param  String $room_id
+	 * @return JSON
+	 */
+	public function post_upload_file($room_id) {
+		$path = DOCROOT.'assets/upload/'.$room_id.'/';
+
+		// ファイルを書き込み専用でオープンします。
+		if (!file_exists($path)) {
+			mkdir($path, 0707, true);
+		}
+
+		// 初期設定
+		$config = array(
+			'path' => $path,
+			'auto_rename' => true,
+			'overwrite' => true,
+		);
+		// アップロード基本プロセス実行
+		Upload::process($config);
+
+		if (Upload::is_valid()) {
+			Upload::save();
+			$files = Upload::get_files();
+			$names = array();
+
+			foreach ($files as $file) {
+				$name[] = $file['saved_as'];
 			}
 
 			return $this->response($name);

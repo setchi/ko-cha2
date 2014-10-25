@@ -190,15 +190,16 @@ $(function () {
 
 /**
  * ファイルをアップロードする
- * @param {File}	 file
- * @param {Function} callback
+ * @param  {String}   type
+ * @param  {File}   file
+ * @param  {Function} callback
  */
-function uploadFile (file, callback) {
+function uploadFile (type, file, callback) {
 	var uploadData = new FormData();
 	uploadData.append('file', file);
 
 	$.ajax({
-		url: 'chat/upload/' + roomInfo.room.id + '.json',
+		url: 'chat/upload_' + type + '/' + roomInfo.room.id + '.json',
 		type: 'post',
 		dataType: 'json',
 		contentType: false,
@@ -249,15 +250,24 @@ function handleDroppedFile (e) {
 		}
 		// 画像がドロップされた
 		if (file.type.match('image.*')) {
-			uploadFile(file, function (json) {
+			uploadFile('image', file, function (json) {
 				for (var i in json) {
 					Chat.send('[image]' + json[i] + '[/image]');
 				}
 			});
+
+		// ファイルがドロップされた
+		} else if (!file.type.match('text.*') && modelist.getModeForPath(file.name).name === 'text') {
+			uploadFile('file', file, function (json) {
+				for (var i in json) {
+					Chat.send('[file]' + json[i] + '[/file]');
+				}
+			});
+
+		// テキストファイルがドロップされた
 		} else {
 			readFile(file);
 		}
-
 	}
 	return Utils.cancelEvent(e);
 }
