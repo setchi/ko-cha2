@@ -18,10 +18,24 @@ var Chat = {
 
 
 	/**
-	 * URLにマッチさせる正規表現
+	 * URL
 	 * @type {RegExp}
 	 */
-	_regexURL: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
+	_URLRegex: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
+
+
+	/**
+	 * 画像受信コマンド
+	 * @type {RegExp}
+	 */
+	_imageReceivingRegex: /\[image\](.*)\[\/image\]/,
+
+
+	/**
+	 * ファイル受信コマンド
+	 * @type {RegExp}
+	 */
+	_fileReceivingRegex: /\[file\](.*)\[\/file\]/,
 
 
 	/**
@@ -65,7 +79,6 @@ var Chat = {
 			data['message'] = encodeURIComponent(message);
 			this.update([data], true);
 
-			//*
 			connection.sendRTC({
 				updated: true,
 				chat_log: [{
@@ -74,13 +87,6 @@ var Chat = {
 					message: encodeURIComponent(message)
 				}]
 			});
-
-			/*/
-			connection.send({
-				type: 'chat_log',
-				data: message
-			});
-			// */
 		}
 	},
 
@@ -106,11 +112,11 @@ var Chat = {
 
 			// html = message + html;
 			var string = "";
-			if (data.message.match('\\[image\\](.*)\\[/image\\]')) {
+			if (this._imageReceivingRegex.test(data.message)) {
 				notificationMessage = '画像を送信しました。';
 				string = this._getImageHTML(data);
 
-			} if (data.message.match('\\[file\\](.*)\\[/file\\]')) {
+			} else if (this._fileReceivingRegex.test(data.message)) {
 				notificationMessage = 'ファイルを送信しました。';
 				string = this._getFileHTML(data);
 
@@ -161,7 +167,7 @@ var Chat = {
 	 * @return {String} 画像ログHTML
 	 */
 	_getImageHTML: function (log) {
-		var imageName = log.message.match('\\[image\\](.*)\\[/image\\]')[1];
+		var imageName = log.message.match(this._imageReceivingRegex)[1];
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var imageUrl = baseUrl + imageName;
 
@@ -179,7 +185,7 @@ var Chat = {
 	 * @return {[type]}     [description]
 	 */
 	_getFileHTML: function (log) {
-		var fileName = log.message.match('\\[file\\](.*)\\[/file\\]')[1];
+		var fileName = log.message.match(this._fileReceivingRegex)[1];
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var fileUrl = baseUrl + fileName;
 

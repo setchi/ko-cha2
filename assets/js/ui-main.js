@@ -407,7 +407,7 @@ $(document).on('mousedown', '.sidebar-handle', function (e) {
 }).on('mousedown', '.tab-item', function (e) {
 	// タブ削除
 	if (isSelf(e) && $(this).find('.close')[0] === e.target) {
-		UIEvent.fire('remove-tab', $(this).parents('.editor-root').attr('id'), $(this).data('tab-id'));
+		UIEvent.fire('remove-tab', localSession.get(roomInfo.room.id), $(this).data('tab-id'));
 	
 	} else {
 		Tab.dragStart(e.pageX, e.pageY, this);
