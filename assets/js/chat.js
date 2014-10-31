@@ -25,20 +25,6 @@ var Chat = {
 
 
 	/**
-	 * 画像受信コマンド
-	 * @type {RegExp}
-	 */
-	_imageReceivingRegex: /\[image\](.*)\[\/image\]/,
-
-
-	/**
-	 * ファイル受信コマンド
-	 * @type {RegExp}
-	 */
-	_fileReceivingRegex: /\[file\](.*)\[\/file\]/,
-
-
-	/**
 	 * チャットログのHTMLテンプレート
 	 * @type {String}
 	 */
@@ -73,19 +59,20 @@ var Chat = {
 		/**
 		 * 発言する
 		 * @param  {String} message
+		 * @param  {String} [type]
 		 */
-		this.send = function (message) {
-			var data = roomInfo.viewer;
-			data['message'] = encodeURIComponent(message);
-			this.update([data], true);
+		this.send = function (message, type) {
+			var data = [{
+				viewer_id: localSession.get(roomInfo.room.id),
+				image: roomInfo.viewer.image,
+				message: encodeURIComponent(message),
+				type: type || false
+			}];
+			this.update(data, true);
 
 			connection.sendRTC({
 				updated: true,
-				chat_log: [{
-					viewer_id: localSession.get(roomInfo.room.id),
-					image: roomInfo.viewer.image,
-					message: encodeURIComponent(message)
-				}]
+				chat_log: data
 			});
 		}
 	},
@@ -108,15 +95,14 @@ var Chat = {
 			if (!selfEnter && currentHtml !== '' && localSession.get(roomInfo.room.id) === data.viewer_id) continue;
 
 			this._history.push($.extend(true, {}, data));
-			data.message = decodeURIComponent(data.message);
 
 			// html = message + html;
 			var string = "";
-			if (this._imageReceivingRegex.test(data.message)) {
+			if (data.type === 'image') {
 				notificationMessage = '画像を送信しました。';
 				string = this._getImageHTML(data);
 
-			} else if (this._fileReceivingRegex.test(data.message)) {
+			} else if (data.type === 'file') {
 				notificationMessage = 'ファイルを送信しました。';
 				string = this._getFileHTML(data);
 
@@ -150,9 +136,10 @@ var Chat = {
 	 * @return {String} ログHTML
 	 */
 	_getRemarkHTML: function (log) {
-		var message = Utils.escapeHTML(log.message).replace(this._regexURL, function () {
+		var message = decodeURIComponent(log.message);
+		message = Utils.escapeHTML(message).replace(this._regexURL, function () {
 			var url = "";
-			log.message.replace(this._regexURL, function ($1, $2) {
+			message.replace(this._regexURL, function ($1, $2) {
 				url = $2;
 			});
 			return Utils.sprintf(this._linkText, url, url);
@@ -167,7 +154,7 @@ var Chat = {
 	 * @return {String} 画像ログHTML
 	 */
 	_getImageHTML: function (log) {
-		var imageName = log.message.match(this._imageReceivingRegex)[1];
+		var imageName = decodeURIComponent(log.message);
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var imageUrl = baseUrl + imageName;
 
@@ -185,7 +172,7 @@ var Chat = {
 	 * @return {[type]}     [description]
 	 */
 	_getFileHTML: function (log) {
-		var fileName = log.message.match(this._fileReceivingRegex)[1];
+		var fileName = decodeURIComponent(log.message);
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var fileUrl = baseUrl + fileName;
 

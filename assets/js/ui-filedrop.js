@@ -252,7 +252,7 @@ function handleDroppedFile (e) {
 		if (file.type.match('image.*')) {
 			uploadFile('image', file, function (json) {
 				for (var i in json) {
-					Chat.send('[image]' + json[i] + '[/image]');
+					Chat.send(json[i], 'image');
 				}
 			});
 
@@ -260,7 +260,7 @@ function handleDroppedFile (e) {
 		} else if (!file.type.match('text.*') && modelist.getModeForPath(file.name).name === 'text') {
 			uploadFile('file', file, function (json) {
 				for (var i in json) {
-					Chat.send('[file]' + json[i] + '[/file]');
+					Chat.send(json[i], 'file');
 				}
 			});
 
