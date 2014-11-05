@@ -1,3 +1,6 @@
+require(['jquery', 'local-session', 'room-info', 'ui-event', 'utils'],
+	function ($, localSession, roomInfo, UIEvent, Utils) {
+
 /*
  * ユーザインタフェースの制御
  */
@@ -437,5 +440,7 @@ $(window).resize(function () {
 	$('.wrapper').height(height + 'px');
 	SidebarHandle.resize($(window).width(), 0);
 }).resize();
+
+});
 
 });

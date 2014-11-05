@@ -116,46 +116,17 @@
 </div>
 <script src="https://skyway.io/dist/0.3/peer.min.js"></script>
 <?php
-	echo Asset::js('lib/src-min/ace.js');
-	echo Asset::js('lib/jquery.min.js');
-	echo Asset::js('lib/bootstrap.min.js');
-	echo Asset::js('lib/encoding.min.js');
+	echo Asset::js('lib/require.min.js');
 /*
-	echo Asset::js('lib/jquery.fancybox.pack.js');
-	echo Asset::js('lib/contextmenu.min.js');
-	echo Asset::js('lib/toastr.min.js');
-	echo Asset::js('lib/notify.js');
 	echo Asset::js('common.js');
-	echo Asset::js('utils.js');
-	echo Asset::js('viewer.js');
-	echo Asset::js('editor-tab.js');
-	echo Asset::js('editor-object.js');
-	echo Asset::js('editor-manager.js');
-	echo Asset::js('connection.js');
-	echo Asset::js('chat.js');
-	echo Asset::js('ui-event.js');
-	echo Asset::js('ui-filedrop.js');
-	echo Asset::js('ui-main.js');
 	echo Asset::js('main.js');
-	echo Asset::js('sdk/sdk.js');
+	echo Asset::js('ui-main.js');
+	echo Asset::js('ui-filedrop.js');
 /*/
-	Casset::js('lib/jquery.fancybox.pack.js');
-	Casset::js('lib/contextmenu.min.js');
-	Casset::js('lib/toastr.min.js');
-	Casset::js('lib/notify.js');
 	Casset::js('common.js');
-	Casset::js('utils.js');
-	Casset::js('viewer.js');
-	Casset::js('editor-tab.js');
-	Casset::js('editor-object.js');
-	Casset::js('editor-manager.js');
-	Casset::js('connection.js');
-	Casset::js('chat.js');
-	Casset::js('ui-event.js');
-	Casset::js('ui-filedrop.js');
-	Casset::js('ui-main.js');
 	Casset::js('main.js');
-	Casset::js('sdk/sdk.js');
+	Casset::js('ui-main.js');
+	Casset::js('ui-filedrop.js');
 	echo Casset::render_js();
 //*/
 ?>

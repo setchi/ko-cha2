@@ -1,3 +1,5 @@
+require(['jquery', 'local-session'], function ($, localSession) {
+
 /**
  * トップページ
  */
@@ -103,4 +105,7 @@ $(function () {
 
 		return false;
 	});
+});
+
+
 });

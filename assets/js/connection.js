@@ -1,20 +1,18 @@
-/**
- * 部屋の情報
- * @type {Object}
- */
-var roomInfo = JSON.parse($('#js_room_info').text());
-
+define(['jquery', 'room-info', 'local-session'],
+	function ($, roomInfo, localSession) {
 
 /**
  * 通信の制御
  */
-var Connection = function () {
+var Connection = function () {};
+Connection.prototype = {
 	/**
 	 * long polling監視開始
 	 */
-	this._watch(-1, -1);
-};
-Connection.prototype = {
+	start: function () {
+		this._watch(-1, -1);
+	},
+
 	/**
 	 * viewerIdごとのDataConnectionのインスタンスを保持する
 	 * @type {Map<String, DataConnection>}
@@ -264,3 +262,7 @@ Connection.prototype = {
 		}.bind(this));
 	}
 }
+
+return new Connection();
+
+});

@@ -1,3 +1,6 @@
+define(['jquery', 'room-info', 'local-session', 'utils', 'editor-object', 'lib/contextmenu.min'],
+	function ($, roomInfo, localSession, Utils, EditorObject) {
+
 /**
  * 全Viewerのエディタの管理
  */
@@ -214,3 +217,7 @@ EditorManager.prototype = {
 		return res;
 	}
 }
+
+return EditorManager;
+
+});

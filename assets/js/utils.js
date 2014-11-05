@@ -1,3 +1,5 @@
+define(['lib/encoding.min'], function (Encoding) {
+
 /**
  * 共通関数
  */
@@ -105,3 +107,7 @@ var Utils = {
 		return Encoding.codeToString(array);
 	}
 }
+
+return Utils;
+
+});

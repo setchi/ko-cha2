@@ -1,4 +1,7 @@
-﻿/**
+﻿define(['jquery', 'room-info', 'local-session', 'utils', 'editor-tab'],
+	function ($, roomInfo, localSession, Utils, Tab) {
+
+/**
  * エディタオブジェクトの制御
  * @param {String} viewerId
  * @param {Number} state 初期位置フラグ
@@ -394,3 +397,7 @@ EditorObject.prototype = {
 		return res;
 	}
 }
+
+return EditorObject;
+
+});

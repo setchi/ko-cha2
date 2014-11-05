@@ -1,8 +1,26 @@
-var connection = new Connection();
+snsApply = function () {};
 
-(function () {
+require(['jquery', 'room-info', 'local-session', 'connection', 'editor-manager', 'viewer', 'ui-event', 'chat', 'ace'],
+	function ($, roomInfo, localSession, connection, EditorManager, Viewer, UIEvent, Chat) {
+	
+	/**
+	 * SNSのアイコン画像を適用する
+	 * @param  {String} image - 新しいアイコンのURL
+	 * @param  {String} name
+	 */
+	snsApply = function (image, name) {
+		connection.send({
+			type: 'update_image',
+			data: {
+				'image': image,
+				'name': name
+			}
+		});
+	}
+
 	var editorManager = new EditorManager();
 	var viewer = new Viewer();
+	connection.start();
 
 	// 相手から接続要求が来た時
 	viewer.on('on-offer', function (peerId) {
@@ -157,4 +175,4 @@ var connection = new Connection();
 		}
 		selfEditor.changeActiveTab(targetTab.id);
 	});
-}());
+});

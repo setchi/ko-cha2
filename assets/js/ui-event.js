@@ -1,3 +1,5 @@
+define(function () {
+
 /**
  * UIの操作に関するイベントを管理する
  */
@@ -37,3 +39,9 @@ UIEvent.prototype = {
 	}
 }
 UIEvent = new UIEvent();
+
+return function () {
+	return UIEvent;
+}
+
+}());

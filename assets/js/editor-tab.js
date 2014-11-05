@@ -1,3 +1,6 @@
+define(['jquery', 'room-info', 'local-session', 'utils', 'connection', 'mode-list'], 
+	function ($, roomInfo, localSession, Utils, connection, modeList) {
+
 /**
  * タブ単体の制御
  * @param {String} viewerId
@@ -425,7 +428,7 @@ Tab.prototype = {
 	applyData: function (data) {
 		// textだったら言語モード再取得. 言語モードが正しく反映されない問題の仮対応. 
 		if (data.mode === 'text') {
-			data.mode = modelist.getModeForPath(data.tabname || this.tabName).name;
+			data.mode = modeList.getModeForPath(data.tabname || this.tabName).name;
 		}
 
 		// 入ってきたプロパティだけ反映する
@@ -454,3 +457,7 @@ Tab.prototype = {
 		return this;
 	}
 }
+
+return Tab;
+
+});

@@ -1,3 +1,5 @@
+define(['jquery', 'room-info', 'local-session', 'chat', 'toastr'], function ($, roomInfo, localSession, Chat, toastr) {
+
 /**
  * Viewerに関する処理
  */
@@ -159,18 +161,6 @@ Viewer.prototype = {
 	}
 }
 
+return Viewer;
 
-/**
- * SNSのアイコン画像を適用する
- * @param  {String} image - 新しいアイコンのURL
- * @param  {String} name
- */
-function snsApply(image, name) {
-	connection.send({
-		type: 'update_image',
-		data: {
-			'image': image,
-			'name': name
-		}
-	});
-}
+});

@@ -71,9 +71,7 @@
 <?php echo $footer ?>
 </div>
 <?php
-	echo Asset::js('lib/jquery.min.js');
-	echo Asset::js('lib/bootstrap.min.js');
-	echo Asset::js("sdk/sdk.js");
+	echo Asset::js('lib/require.min.js');
 	echo Asset::js("common.js");
 	echo Asset::js("index.js");
 ?>
