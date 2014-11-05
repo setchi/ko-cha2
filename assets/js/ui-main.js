@@ -1,5 +1,11 @@
-require(['jquery', 'local-session', 'room-info', 'ui-event', 'utils'],
-	function ($, localSession, roomInfo, UIEvent, Utils) {
+require([
+	'jquery',
+	'local-session',
+	'room-info',
+	'ui-event',
+	'utils'
+], function ($, localSession, roomInfo, UIEvent, Utils) {
+
 
 /*
  * ユーザインタフェースの制御

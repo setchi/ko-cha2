@@ -1,11 +1,18 @@
-define(['jquery', 'room-info', 'local-session', 'utils', 'lib/jquery.fancybox.pack'],
-	function ($, roomInfo, localSession, Utils) {
+define([
+	'jquery',
+	'room-info',
+	'local-session',
+	'utils',
+	'notify',
+	'jquery.fancybox'
+], function ($, roomInfo, localSession, Utils, Notify) {
+
 
 /**
  * チャットログに関する処理
  * @type {Object}
  */
-var Chat = {
+return {
 	/**
 	 * チャットログを保持する
 	 * @type {Array}
@@ -206,7 +213,5 @@ var Chat = {
 		return this._history;
 	}
 }
-
-return Chat;
 
 });

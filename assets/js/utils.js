@@ -1,4 +1,5 @@
-define(['lib/encoding.min'], function (Encoding) {
+define(['encoding'], function (Encoding) {
+
 
 /**
  * 共通関数

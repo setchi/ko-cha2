@@ -1,4 +1,11 @@
-define(['jquery', 'room-info', 'local-session', 'chat', 'toastr'], function ($, roomInfo, localSession, Chat, toastr) {
+define([
+	'jquery',
+	'room-info',
+	'local-session',
+	'chat',
+	'toastr'
+], function ($, roomInfo, localSession, Chat, toastr) {
+
 
 /**
  * Viewerに関する処理

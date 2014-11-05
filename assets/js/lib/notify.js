@@ -4,7 +4,7 @@
 
     if (typeof define === 'function' && define.amd) {
         // AMD environment
-        define('notify', [], function () {
+        define(function () {
             return factory(root, document);
         });
     } else if (typeof exports === 'object') {

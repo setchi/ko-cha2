@@ -1,5 +1,9 @@
-define(['jquery', 'room-info', 'local-session'],
-	function ($, roomInfo, localSession) {
+define([
+	'jquery',
+	'room-info',
+	'local-session'
+], function ($, roomInfo, localSession) {
+
 
 /**
  * 通信の制御

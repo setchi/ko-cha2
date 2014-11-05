@@ -1,5 +1,12 @@
-define(['jquery', 'room-info', 'local-session', 'utils', 'connection', 'mode-list'], 
-	function ($, roomInfo, localSession, Utils, connection, modeList) {
+define([
+	'jquery',
+	'room-info',
+	'local-session',
+	'utils',
+	'connection',
+	'mode-list'
+], function ($, roomInfo, localSession, Utils, connection, modeList) {
+
 
 /**
  * タブ単体の制御

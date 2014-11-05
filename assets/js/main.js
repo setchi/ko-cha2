@@ -1,8 +1,18 @@
 snsApply = function () {};
 
-require(['jquery', 'room-info', 'local-session', 'connection', 'editor-manager', 'viewer', 'ui-event', 'chat', 'ace'],
-	function ($, roomInfo, localSession, connection, EditorManager, Viewer, UIEvent, Chat) {
-	
+require([
+	'jquery',
+	'room-info',
+	'local-session',
+	'connection',
+	'editor-manager',
+	'viewer',
+	'ui-event',
+	'chat',
+	'ace'
+], function ($, roomInfo, localSession, connection, EditorManager, Viewer, UIEvent, Chat) {
+
+
 	/**
 	 * SNSのアイコン画像を適用する
 	 * @param  {String} image - 新しいアイコンのURL

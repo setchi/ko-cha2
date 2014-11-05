@@ -1,5 +1,12 @@
-﻿define(['jquery', 'room-info', 'local-session', 'utils', 'editor-tab'],
-	function ($, roomInfo, localSession, Utils, Tab) {
+﻿define([
+	'jquery',
+	'room-info',
+	'local-session',
+	'utils',
+	'editor-tab',
+	'toastr'
+], function ($, roomInfo, localSession, Utils, Tab, toastr) {
+
 
 /**
  * エディタオブジェクトの制御

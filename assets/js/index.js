@@ -1,4 +1,8 @@
-require(['jquery', 'local-session'], function ($, localSession) {
+require([
+	'jquery',
+	'local-session'
+], function ($, localSession) {
+
 
 /**
  * トップページ

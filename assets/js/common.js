@@ -2,22 +2,33 @@ require.config({
 	baseUrl: 'assets/js/',
 
 	paths: {
-		'jquery': '//code.jquery.com/jquery-2.1.1.min',
-		'notify': 'lib/notify',
-		'toastr': 'lib/toastr.min',
+		'jquery': [
+			'//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
+			'lib/jquery.min.js'
+		],
+		'jquery.fancybox': 'lib/jquery.fancybox.pack',
+		'jquery.contextmenu': 'lib/contextmenu.min',
+		'bootstrap': 'lib/bootstrap.min',
 		'ace': 'lib/src-min/ace',
-		'sdk': 'sdk/sdk'
+		'encoding': 'lib/encoding.min',
+		'toastr': 'lib/toastr.min',
+		'notify': 'lib/notify'
 	},
 
 	shim: {
-		'lib/bootstrap.min': ['jquery'],
-		'lib/contextmenu.min': ['jquery'],
-		'lib/jquery.fancybox.pack': ['jquery']
+		'jquery.contextmenu': ['jquery'],
+		'jquery.fancybox': ['jquery'],
+		'bootstrap': ['jquery']
 	}
 });
 
 
-require(['jquery', 'lib/bootstrap.min', 'sdk'], function ($) {
+require([
+	'jquery',
+	'bootstrap',
+	'lib/sdk/sdk'
+], function ($) {
+
 
 /*
  * 全ページ共通処理

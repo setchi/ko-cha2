@@ -1,5 +1,12 @@
-require(['jquery', 'room-info', 'utils', 'chat', 'mode-list', 'ui-event'],
-	function ($, roomInfo, Utils, Chat, modeList, UIEvent) {
+require([
+	'jquery',
+	'room-info',
+	'utils',
+	'chat',
+	'mode-list',
+	'ui-event'
+], function ($, roomInfo, Utils, Chat, modeList, UIEvent) {
+
 
 /**
  * ファイルドロップに関する処理
