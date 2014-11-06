@@ -2,9 +2,9 @@
 
 return array(
 
-	'path' => '/ko-cha/auth/login/',
+	'path' => 'auth/login/',
 	'security_salt' => '', // デフォルトで設定されている値と違うものにする　※同じ場合動作しない
-	'callback_url' => '/ko-cha/auth/callback/',
+	'callback_url' => 'auth/callback/',
 
 	'Strategy' => array(
 	    'Facebook' => array(

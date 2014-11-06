@@ -82,10 +82,8 @@ class Controller_Auth extends Controller
 
                 $img = file_get_contents($auth['info']['image']);//画像を取得
 
-                $img_fullpath = 'assets/img/user_icon/sns/'.$user_id.'.jpg';//画像の保存フルパス
+                $img_fullpath = 'assets/img/user/sns/'.$user_id.'.jpg';//画像の保存フルパス
                 file_put_contents(DOCROOT.$img_fullpath, $img);//保存
-
-                $img_fullpath = '/ko-cha/'.$img_fullpath;
 
                 return Response::forge("
 <script>
