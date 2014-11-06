@@ -117,18 +117,8 @@
 <script src="https://skyway.io/dist/0.3/peer.min.js"></script>
 <?php
 	echo Asset::js('lib/require.min.js');
-/*
 	echo Asset::js('common.js');
 	echo Asset::js('main.js');
-	echo Asset::js('ui-main.js');
-	echo Asset::js('ui-filedrop.js');
-/*/
-	Casset::js('common.js');
-	Casset::js('main.js');
-	Casset::js('ui-main.js');
-	Casset::js('ui-filedrop.js');
-	echo Casset::render_js();
-//*/
 ?>
 </body>
 </html>

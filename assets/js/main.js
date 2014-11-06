@@ -7,10 +7,12 @@ require([
 	'connection',
 	'editor-manager',
 	'viewer',
-	'ui-event',
 	'chat',
+	'ui-event',
+	'ui-filedrop',
+	'ui-main',
 	'ace'
-], function ($, roomInfo, localSession, connection, EditorManager, Viewer, UIEvent, Chat) {
+], function ($, roomInfo, localSession, connection, EditorManager, Viewer, Chat, UIEvent) {
 
 
 	/**
