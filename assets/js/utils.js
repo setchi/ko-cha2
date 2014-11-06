@@ -1,5 +1,5 @@
 define(['encoding'], function (Encoding) {
-
+"use strict";
 
 /**
  * 共通関数

@@ -3,7 +3,7 @@ define([
 	'room-info',
 	'local-session'
 ], function ($, roomInfo, localSession) {
-
+"use strict";
 
 /**
  * 通信の制御

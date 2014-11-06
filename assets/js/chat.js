@@ -6,7 +6,7 @@ define([
 	'notify',
 	'jquery.fancybox'
 ], function ($, roomInfo, localSession, Utils, Notify) {
-
+"use strict";
 
 /**
  * チャットログに関する処理

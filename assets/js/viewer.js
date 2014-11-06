@@ -5,7 +5,7 @@ define([
 	'chat',
 	'toastr'
 ], function ($, roomInfo, localSession, Chat, toastr) {
-
+"use strict";
 
 /**
  * Viewerに関する処理

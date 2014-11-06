@@ -2,7 +2,7 @@ require([
 	'jquery',
 	'local-session'
 ], function ($, localSession) {
-
+"use strict";
 
 /**
  * トップページ

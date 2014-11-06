@@ -13,7 +13,7 @@ require([
 	'ui-main',
 	'ace'
 ], function ($, roomInfo, localSession, connection, EditorManager, Viewer, Chat, UIEvent) {
-
+	"use strict";
 
 	/**
 	 * SNSのアイコン画像を適用する

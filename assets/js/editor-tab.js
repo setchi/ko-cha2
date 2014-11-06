@@ -6,7 +6,7 @@ define([
 	'connection',
 	'mode-list'
 ], function ($, roomInfo, localSession, Utils, connection, modeList) {
-
+"use strict";
 
 /**
  * タブ単体の制御

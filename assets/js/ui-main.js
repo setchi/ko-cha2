@@ -5,7 +5,7 @@ require([
 	'ui-event',
 	'utils'
 ], function ($, localSession, roomInfo, UIEvent, Utils) {
-
+"use strict";
 
 /*
  * ユーザインタフェースの制御

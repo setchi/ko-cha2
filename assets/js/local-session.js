@@ -1,4 +1,5 @@
 define(function () {
+"use strict";
 
 /**
  * 部屋ごとの自分のViewerIDをlocalStorageで管理する。

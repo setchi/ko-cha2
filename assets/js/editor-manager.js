@@ -6,7 +6,7 @@ define([
 	'editor-object',
 	'jquery.contextmenu'
 ], function ($, roomInfo, localSession, Utils, EditorObject) {
-
+"use strict";
 
 /**
  * 全Viewerのエディタの管理

@@ -6,7 +6,7 @@
 	'editor-tab',
 	'toastr'
 ], function ($, roomInfo, localSession, Utils, Tab, toastr) {
-
+"use strict";
 
 /**
  * エディタオブジェクトの制御

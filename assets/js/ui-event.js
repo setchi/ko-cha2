@@ -1,4 +1,5 @@
 define(function () {
+"use strict";
 
 /**
  * UIの操作に関するイベントを管理する

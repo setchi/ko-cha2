@@ -6,7 +6,7 @@ require([
 	'mode-list',
 	'ui-event'
 ], function ($, roomInfo, Utils, Chat, modeList, UIEvent) {
-
+"use strict";
 
 /**
  * ファイルドロップに関する処理

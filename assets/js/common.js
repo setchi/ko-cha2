@@ -28,7 +28,7 @@ require([
 	'bootstrap',
 	'lib/sdk/sdk'
 ], function ($) {
-
+"use strict";
 
 /*
  * 全ページ共通処理

@@ -1,4 +1,5 @@
-define(function () {"use strict";
+define(function () {
+"use strict";
 
 /**
  * ファイル拡張子と言語モードを関連付けるモジュール
