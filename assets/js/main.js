@@ -6,13 +6,14 @@ require([
 	'local-session',
 	'connection',
 	'editor-manager',
+	'editor-positions-enum',
 	'viewer',
 	'chat',
 	'ui-event',
 	'ui-filedrop',
 	'ui-main',
 	'ace'
-], function ($, roomInfo, localSession, connection, EditorManager, Viewer, Chat, UIEvent) {
+], function ($, roomInfo, localSession, connection, EditorManager, EditorPositionsEnum, Viewer, Chat, UIEvent) {
 	"use strict";
 
 	/**
@@ -152,13 +153,13 @@ require([
 
 	// タブのレイアウトを変更
 	UIEvent.on('switch-tab-layout', function (viewerId, tabId, layout) {
-		editorManager.get(viewerId).setLayout(tabId, layout);
+		// 未実装
 	});
 
 
 	// エディタのレイアウトを変更
 	UIEvent.on('switch-editor-layout', function (viewerId, layout) {
-		editorManager.setLayout(viewerId, layout);
+		editorManager.setPosition(viewerId, layout);
 	});
 
 
@@ -183,7 +184,7 @@ require([
 		
 		// 自分のエディタを開いていなければ表示
 		if (!selfEditor.isViewing()) {
-			editorManager.setLayout(localSession.get(roomInfo.room.id), 4);
+			editorManager.setPosition(localSession.get(roomInfo.room.id), EditorPositionsEnum.FULLSCREEN);
 		}
 		selfEditor.changeActiveTab(targetTab.id);
 	});

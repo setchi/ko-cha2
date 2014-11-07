@@ -3,8 +3,9 @@ require([
 	'local-session',
 	'room-info',
 	'ui-event',
-	'utils'
-], function ($, localSession, roomInfo, UIEvent, Utils) {
+	'utils',
+	'editor-positions-enum'
+], function ($, localSession, roomInfo, UIEvent, Utils, EditorPositionsEnum) {
 "use strict";
 
 /*
@@ -122,7 +123,7 @@ var Tab = {
 	rootHeight: null,
 	isInside: null,
 	markFrame: null,
-	frameState: -1,
+	framePosition: -1,
 
 	dragStart: function (startX, startY, target) {
 		this.dragging = true;
@@ -146,9 +147,9 @@ var Tab = {
 		this.dragging  = false;
 		this.temporaryTab.remove();
 
-		if (this.frameState !== -1) {
-			UIEvent.fire('switch-tab-layout', this.targetId, $(this.target).data('tab-id'), this.frameState);
-			this.frameState = -1;
+		if (this.framePosition !== -1) {
+			UIEvent.fire('switch-tab-layout', this.targetId, $(this.target).data('tab-id'), this.framePosition);
+			this.framePosition = -1;
 		}
 		if (this.isInside) {
 			this.removeMarkFrame();
@@ -207,31 +208,38 @@ var Tab = {
 			this.isInside = true;
 			return;
 		}
-		var state = 0;
-		if (localX < width * widthThreshold) {					// 左
+		
+		var position;
+		if (localX < width * widthThreshold) {
+			position = EditorPositionsEnum.LEFT;
 			width >>= 1;
-		} else if (localX > width - width * widthThreshold) {	// 右
-			state = 1;
+
+		} else if (localX > width - width * widthThreshold) {
+			position = EditorPositionsEnum.RIGHT;
 			width >>= 1;
 			rootOffset.left += width;
-		} else if (localY < height * heightThreshold) {		// 上
-			state = 2;
+
+		} else if (localY < height * heightThreshold) {	
+			position = EditorPositionsEnum.TOP;
 			height >>= 1;
-		} else if (localY > height - height * heightThreshold) {// 下
-			state = 3;
+
+		} else if (localY > height - height * heightThreshold) {
+			position = EditorPositionsEnum.BOTTOM;
 			height >>= 1;
 			rootOffset.top += height;
+
 		} else {
-			state = 4;
+			position = EditorPositionsEnum.FULLSCREEN;
 		}
-		if (state !== this.frameState) {
+
+		if (position !== this.framePosition) {
 			this.markFrame.moveTo(
 				rootOffset.top + 34,
 				rootOffset.left,
 				width,
 				height
 			);
-			this.frameState = state;
+			this.framePosition = position;
 		}
 	},
 
@@ -240,7 +248,7 @@ var Tab = {
 	},
 
 	removeMarkFrame: function () {
-		this.frameState = -1;
+		this.framePosition = -1;
 		this.markFrame && this.markFrame.remove();
 		this.isInside = false;
 	},
@@ -284,7 +292,7 @@ var ViewerIcon = {
 	$root: $(document.getElementById('editor-region')),
 	temporaryViewerIcon: $(document.getElementsByClassName('temporary-icon')),
 	markFrame: $(document.getElementsByClassName('mark-frame')),
-	frameState: -1,
+	framePosition: -1,
 
 	dragStart: function (pageX, pageY, target) {
 		this.startY = pageY;
@@ -301,9 +309,9 @@ var ViewerIcon = {
 		this.temporaryViewerIcon.remove();
 		this.markFrame.remove();
 		
-		if (this.frameState !== -1) {
-			UIEvent.fire('switch-editor-layout', this.$target.data('viewer-id'), this.frameState);
-			this.frameState = -1;
+		if (this.framePosition !== -1) {
+			UIEvent.fire('switch-editor-layout', this.$target.data('viewer-id'), this.framePosition);
+			this.framePosition = -1;
 		}
 		// アイコンクリック
 		var threshold = 3;
@@ -339,9 +347,9 @@ var ViewerIcon = {
 			'top': pageY - this.$target.height()
 		});
 
-		var editorOffset = this.$root.offset();
-		var localX = pageX - editorOffset.left;
-		var localY = pageY - editorOffset.top;
+		var rootOffset = this.$root.offset();
+		var localX = pageX - rootOffset.left;
+		var localY = pageY - rootOffset.top;
 		var width = this.$root.width();
 		var widthThreshold = 0.3;
 		var height = this.$root.height();
@@ -351,7 +359,7 @@ var ViewerIcon = {
 			if (this.isInside) {
 				this.markFrame.remove();
 				this.isInside = false;
-				this.frameState = -1;
+				this.framePosition = -1;
 			}
 			return;
 		}
@@ -360,31 +368,38 @@ var ViewerIcon = {
 			this.isInside = true;
 			return;
 		}
-		var state = 0;
-		if (localX < width * widthThreshold) {					// 左
+
+		var position;
+		if (localX < width * widthThreshold) {
+			position = EditorPositionsEnum.LEFT;
 			width >>= 1;
-		} else if (localX > width - width * widthThreshold) {	// 右
-			state = 1;
+
+		} else if (localX > width - width * widthThreshold) {
+			position = EditorPositionsEnum.RIGHT;
 			width >>= 1;
-			editorOffset.left += width;
-		} else if (localY < height * heightThreshold) {		// 上
-			state = 2;
+			rootOffset.left += width;
+
+		} else if (localY < height * heightThreshold) {	
+			position = EditorPositionsEnum.TOP;
 			height >>= 1;
-		} else if (localY > height - height * heightThreshold) {// 下
-			state = 3;
+
+		} else if (localY > height - height * heightThreshold) {
+			position = EditorPositionsEnum.BOTTOM;
 			height >>= 1;
-			editorOffset.top += height;
+			rootOffset.top += height;
+
 		} else {
-			state = 4;
+			position = EditorPositionsEnum.FULLSCREEN;
 		}
-		if (state !== this.frameState) {
+
+		if (position !== this.framePosition) {
 			this.markFrame.moveTo(
-				editorOffset.top,
-				editorOffset.left,
+				rootOffset.top,
+				rootOffset.left,
 				width,
 				height
 			);
-			this.frameState = state;
+			this.framePosition = position;
 		}
 	},
 

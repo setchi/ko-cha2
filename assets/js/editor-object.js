@@ -4,16 +4,17 @@
 	'local-session',
 	'utils',
 	'editor-tab',
+	'editor-positions-enum',
 	'toastr'
-], function ($, roomInfo, localSession, Utils, Tab, toastr) {
+], function ($, roomInfo, localSession, Utils, Tab, EditorPositionsEnum, toastr) {
 "use strict";
 
 /**
  * エディタオブジェクトの制御
  * @param {String} viewerId
- * @param {Number} state 初期位置フラグ
+ * @param {EditorPositionsEnum} position 初期位置フラグ
  */
-var EditorObject = function (viewerId, state) {
+var EditorObject = function (viewerId, position) {
 	// HTML要素を生成する
 	$('#ko-cha-templates').find('.editor-root').clone().attr('id', viewerId).appendTo('#editor-region');
 
@@ -55,10 +56,10 @@ var EditorObject = function (viewerId, state) {
 
 	/**
 	 * 現在の位置フラグ
-	 * @type {Number}
+	 * @type {EditorPositionsEnum}
 	 */
-	this.state = state;
-	this.setPosition(state);
+	this.position = position;
+	this.setPosition(position);
 
 
 	/**
@@ -126,30 +127,35 @@ EditorObject.prototype = {
 
 
 	/**
-	 * 位置フラグから位置とサイズを求める(もっと分かりやすくしたい)
-	 * @param  {Number} state
+	 * 位置フラグから位置とサイズを求める
+	 * @param  {EditorPositionsEnum} position
 	 * @return {Object}
 	 */
-	getSizeRate: function (state) {
+	getSizeRate: function (position) {
 		var rates = { top: 0, left: 0, width: 0, height: 0 };
-		switch (state) {
-		case 0: // 左
+
+		switch (position) {
+		case EditorPositionsEnum.LEFT:
 			rates.width = 50;
 			rates.height = 100;
 			break;
-		case 1: // 右
+
+		case EditorPositionsEnum.RIGHT:
 			rates.width = rates.left = 50;
 			rates.height = 100;
 			break;
-		case 2: // 上
+
+		case EditorPositionsEnum.TOP:
 			rates.height = 50;
 			rates.width = 100;
 			break;
-		case 3: // 下
+
+		case EditorPositionsEnum.BOTTOM:
 			rates.height = rates.top = 50;
 			rates.width = 100;
 			break;
-		case 4:
+
+		case EditorPositionsEnum.FULLSCREEN:
 			rates.width = rates.height = 100;
 			break;
 		}
@@ -159,11 +165,11 @@ EditorObject.prototype = {
 
 	/**
 	 * エディタの位置を変更する
-	 * @param {Number} state
+	 * @param {EditorPositionsEnum} position
 	 */
-	setPosition: function (state) {
-		this.state = state;
-		var rates = this.getSizeRate(state);
+	setPosition: function (position) {
+		this.position = position;
+		var rates = this.getSizeRate(position);
 		this.$root.css({
 			'position': 'relative',
 			'top': rates.top + '%',
@@ -177,27 +183,8 @@ EditorObject.prototype = {
 		var _self = this;
 		this.tabResize();
 		$(window).resize();
-		// console.log(this.viewerId, state);
+		// console.log(this.viewerId, position);
 		return this;
-	},
-
-
-	/**
-	 * タブの位置を変更する(未実装)
-	 * @param {String} tabId
-	 * @param {Number} state
-	 */
-	setLayout: function (tabId, state) {
-		console.log(tabId, state);
-	},
-
-
-	/**
-	 * 現在の位置フラグを取得
-	 * @return {Number} 位置フラグ
-	 */
-	getPositionState: function () {
-		return this.state
 	},
 
 
@@ -306,7 +293,7 @@ EditorObject.prototype = {
 	 * @param  {Number} rootHeight
 	 */
 	resize: function (rootWidth, rootHeight) {
-		var rates = this.getSizeRate(this.state);
+		var rates = this.getSizeRate(this.position);
 		this.$root.add(this.$root.find('.ace_editor')).css({
 			'width': rootWidth * rates.width / 100 + 'px',
 			'height' : rootHeight * rates.height / 100 - 35 + 'px'

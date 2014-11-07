@@ -4,8 +4,9 @@ define([
 	'local-session',
 	'utils',
 	'editor-object',
+	'editor-positions-enum',
 	'jquery.contextmenu'
-], function ($, roomInfo, localSession, Utils, EditorObject) {
+], function ($, roomInfo, localSession, Utils, EditorObject, EditorPositionsEnum) {
 "use strict";
 
 /**
@@ -25,7 +26,7 @@ EditorManager.prototype = {
 	 */
 	init: function () {
 		var targetTab = null;
-		this.setLayout(localSession.get(roomInfo.room.id), 4);
+		this.setPosition(localSession.get(roomInfo.room.id), EditorPositionsEnum.FULLSCREEN);
 
 		// 自身のタブが右クリックされたら設定ウィンドウを表示
 		var _self = this;
@@ -84,7 +85,7 @@ EditorManager.prototype = {
 	 * @param {String} viewerId
 	 */
 	add: function (viewerId) {
-		this.editorList[viewerId] = new EditorObject(viewerId, 4).hide();
+		this.editorList[viewerId] = new EditorObject(viewerId, EditorPositionsEnum.FULLSCREEN).hide();
 	},
 
 
@@ -178,14 +179,20 @@ EditorManager.prototype = {
 	/**
 	 * エディタのレイアウトを変更する
 	 * @param {String} viewerId
-	 * @param {Number} state    位置フラグ
+	 * @param {EditorPositionsEnum} position    位置フラグ
 	 */
-	setLayout: function (viewerId, state) {
+	setPosition: function (viewerId, position) {
 		if (void 0 === this.editorList[viewerId]) {
 			this.add(viewerId);
 		}
 
-		var pairPosition = [1, 0, 3, 2, -1];
+		var pairPosition = [];
+		pairPosition[EditorPositionsEnum.LEFT] = EditorPositionsEnum.RIGHT;
+		pairPosition[EditorPositionsEnum.RIGHT] = EditorPositionsEnum.LEFT;
+		pairPosition[EditorPositionsEnum.TOP] = EditorPositionsEnum.BOTTOM;
+		pairPosition[EditorPositionsEnum.BOTTOM] = EditorPositionsEnum.TOP;
+		pairPosition[EditorPositionsEnum.FULLSCREEN] = EditorPositionsEnum.FULLSCREEN;
+
 		var $editors = this.editorList[viewerId].$editorRegion.find('.editor-root');
 		var _self = this;
 
@@ -196,16 +203,16 @@ EditorManager.prototype = {
 		}
 		// ターゲットをeditorRegionの一番上に移動する
 		this.editorList[viewerId].$root.prependTo(this.editorList[viewerId].$editorRegion);
-		this.editorList[viewerId].show().setPosition(state).tabResize();
+		this.editorList[viewerId].show().setPosition(position).tabResize();
 
 		for (var id in this.editorList) {
 			if (!this.editorList[id].isViewing() || id === viewerId) {
 				continue;
 			}
-			if (pairPosition[state] === -1) {
+			if (position === EditorPositionsEnum.FULLSCREEN) {
 				this.editorList[id].hide();
 			} else {
-				this.editorList[id].show().setPosition(pairPosition[state]);
+				this.editorList[id].show().setPosition(pairPosition[position]);
 			}
 		}
 	},
