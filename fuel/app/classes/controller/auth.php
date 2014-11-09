@@ -85,11 +85,12 @@ class Controller_Auth extends Controller
                 $img_fullpath = 'assets/img/user/sns/'.$user_id.'.jpg';//画像の保存フルパス
                 file_put_contents(DOCROOT.$img_fullpath, $img);//保存
 
-                return Response::forge("
-<script>
-window.opener.snsApply('$img_fullpath', '$nickname');
-close();
-</script>");
+                $view = ViewUtils::view_setup('room/sns_icon_applyer');
+                $view->data = array(
+                    'image' => $img_fullpath,
+                    'name' => $nickname
+                );
+                return Response::forge($view);
             }
         }
         return Response::forge(var_dump($response));

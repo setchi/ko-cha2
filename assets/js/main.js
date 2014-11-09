@@ -1,5 +1,3 @@
-snsApply = function () {};
-
 require([
 	'jquery',
 	'room-info',
@@ -15,21 +13,6 @@ require([
 	'ace'
 ], function ($, roomInfo, localSession, connection, EditorManager, EditorPositionsEnum, Viewer, Chat, UIEvent) {
 	"use strict";
-
-	/**
-	 * SNSのアイコン画像を適用する
-	 * @param  {String} image - 新しいアイコンのURL
-	 * @param  {String} name
-	 */
-	snsApply = function (image, name) {
-		connection.send({
-			type: 'update_image',
-			data: {
-				'image': image,
-				'name': name
-			}
-		});
-	}
 
 	var editorManager = new EditorManager();
 	var viewer = new Viewer();
