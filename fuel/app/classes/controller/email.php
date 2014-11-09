@@ -17,18 +17,22 @@ class Controller_Email extends Controller_Rest
 
 		$err_msg = '送信が完了しました。';
 
-		if (!$body) {
+		if (!$body)
+		{
 			return $this->response(array(
 				'error' => 'no message'
 			));
 		}
-		try {
+		try
+		{
 		    $email->send();
 		}
-		catch (\EmailValidationFailedException $e) {
+		catch (\EmailValidationFailedException $e)
+		{
 		    $err_msg = '送信に失敗しました。';
 		}
-		catch (\EmailSendingFailedException $e) {
+		catch (\EmailSendingFailedException $e)
+		{
 		    $err_msg = '送信に失敗しました。';
 		}
 		return $this->response(array(

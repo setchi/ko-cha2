@@ -3,7 +3,8 @@
  * 自作Util置き場
  */
 
-class ViewUtils {
+class ViewUtils
+{
 	/**
 	 * viewに共通の属性を付与
 	 *
@@ -11,7 +12,8 @@ class ViewUtils {
 	 * @param $view
 	 * @return $view
 	 */
-	public static function view_setup($path) {
+	public static function view_setup($path)
+	{
 		$view = View::forge($path);
 		$view->set_global('base_url', Uri::base(false));
 		$view->head = View::forge('common/head');

@@ -2,7 +2,8 @@
 
 class Model_Editor extends Model
 {
-	public static function get_data($table, $room_id, $viewer_id, $last_time) {
+	public static function get_data($table, $room_id, $viewer_id, $last_time)
+	{
 		$query = DB::select(
 			'viewer_id',
 			'tab_id',
@@ -13,7 +14,8 @@ class Model_Editor extends Model
 			->and_where('time', '>=', $last_time);
 
 		// 初回以外は自分以外の更新情報だけ取得する
-		if ($last_time != 0) {
+		if ($last_time != 0)
+		{
 			$query = $query->and_where('viewer_id', '!=', $viewer_id);
 		}
 
@@ -23,16 +25,21 @@ class Model_Editor extends Model
 			'tab_id'
 		)->order_by('time')->execute()->as_array();
 
-		if (0 === count($query)) {
+		if (0 === count($query))
+		{
 			return array();
-		} else {
+		}
+		else
+		{
 			return $query;
 		}
 	}
 
-	public static function set_data($table, $room_id, $viewer_id, $data, $last_time) {
+	public static function set_data($table, $room_id, $viewer_id, $data, $last_time)
+	{
 		$data_obj = json_decode($data);
-		if (property_exists ($data_obj , 'command')) if ($data_obj->command === 'removeTab') {
+		if (property_exists ($data_obj , 'command')) if ($data_obj->command === 'removeTab')
+		{
 			DB::delete('editor_change_text')
 				->where('room_id', $room_id)
 				->and_where('viewer_id', $viewer_id)
@@ -47,7 +54,8 @@ class Model_Editor extends Model
 			->execute()->as_array();
 
 		// insert
-		if (0 === count($prev_data)) {
+		if (0 === count($prev_data))
+		{
 			DB::insert($table)->set(array(
 				'room_id' => $room_id,
 				'viewer_id' => $viewer_id,
@@ -57,7 +65,9 @@ class Model_Editor extends Model
 			))->execute();
 
 		// update
-		} else {
+		}
+		else
+		{
 			DB::update($table)->set(array(
 				'data' => $data,
 				'time' => $last_time
