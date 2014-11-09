@@ -9,7 +9,7 @@ Ko-cha2
 共有したいファイルをドラッグ&ドロップするか、タブエリアをダブルクリックして空タブを開きます。
 通信は基本的にWebRTCで行っています。Ctrl+Sでサーバ上にコードを記憶することもできます。
 
-![ko-cha2](http://setchi.jp/ko-cha2/assets/img/ko-cha2_s.png "ko-cha2")
+![ko-cha2](assets/img/ko-cha2_s.png "ko-cha2")
 
 できること
 --------------------
