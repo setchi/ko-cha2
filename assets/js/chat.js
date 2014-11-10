@@ -31,7 +31,7 @@ return {
 	 * URL
 	 * @type {RegExp}
 	 */
-	_URLRegex: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/,
+	_URLRegex: /(?:^|[\s　]+)((?:https?|ftp):\/\/[^\s　]+)/g,
 
 
 	/**
@@ -39,13 +39,6 @@ return {
 	 * @type {String}
 	 */
 	_logText: '<div class="letter"><span class="viewer-icon %s" style="background-image:url(%s)"></span>%s</div>',
-
-
-	/**
-	 * リンクのHTMLテンプレート
-	 * @type {String}
-	 */
-	_linkText: '<a href="%s" target="_blank">%s</a>',
 
 
 	/**
@@ -98,35 +91,22 @@ return {
 			currentHtml = $.trim(this._$log.html());
 
 		for (var i in logs) {
-			var data = logs[i],
-				notificationMessage = data.message;
+			var data = logs[i];
 
 			// TODO: ついさっきスクリプトから挿入した自分の発言が、サーバーからも送られて来るので無視している。もっと構造を整える。
 			if (!selfEnter && currentHtml !== '' && localSession.get(roomInfo.room.id) === data.viewer_id) continue;
 
 			this._history.push($.extend(true, {}, data));
 
-			// html = message + html;
-			var string = "";
-			if (data.type === 'image') {
-				notificationMessage = '画像を送信しました。';
-				string = this._getImageHTML(data);
-
-			} else if (data.type === 'file') {
-				notificationMessage = 'ファイルを送信しました。';
-				string = this._getFileHTML(data);
-
-			} else {
-				string = this._getRemarkHTML(data);
-			}
-			html = string + html;
+			var logData = this._createHTMLAndNotifyMessage(data);
+			html = logData.HTML + html;
 			
 			// 自分の更新でなく、今この画面を見ていなければデスクトップ通知を出す
 			if (localSession.get(roomInfo.room.id) !== data.viewer_id) {
 				Utils.executeIfNotViewing(function () {
 					var myNotification = new Notify('Ko-cha', {
 						icon: this.getIconUrl(data.image),
-						body: notificationMessage
+						body: logData.notificationMessage
 					});
 					myNotification.show();
 				}.bind(this));
@@ -141,19 +121,49 @@ return {
 
 
 	/**
-	 * ログHTML生成
+	 * チャットログと通知用メッセージ生成
+	 * @param  {[type]} log
+	 */
+	_createHTMLAndNotifyMessage: function (log) {
+		var logHTML = "", notificationMessage = "";
+
+		switch (log.type) {
+		case 'image':
+			notificationMessage = '画像を送信しました。';
+			logHTML = this._buildImageHTML(log);
+			break;
+
+		case 'file':
+			notificationMessage = 'ファイルを送信しました。';
+			logHTML = this._buildFileHTML(log);
+			break;
+
+		default:
+			notificationMessage = log.message;
+			logHTML = this._buildRemarkHTML(log);
+			break;
+		}
+
+		return {
+			HTML: logHTML,
+			notificationMessage: notificationMessage
+		}
+	},
+
+
+	/**
+	 * 発言ログHTML生成
 	 * @param  {Object} log
 	 * @return {String} ログHTML
 	 */
-	_getRemarkHTML: function (log) {
-		var message = decodeURIComponent(log.message);
-		message = Utils.escapeHTML(message).replace(this._URLRegex, function () {
-			var url = "";
-			message.replace(this._URLRegex, function ($1, $2) {
-				url = $2;
-			});
-			return Utils.sprintf(this._linkText, url, url);
+	_buildRemarkHTML: function (log) {
+		var message = Utils.escapeHTML(decodeURIComponent(log.message));
+
+		// URLをリンク化
+		message = message.replace(this._URLRegex, function ($1, url) {
+			return Utils.sprintf('<a href="%s" target="_blank">%s</a>', url, url);
 		}.bind(this));
+		
 		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), message);
 	},
 
@@ -163,7 +173,7 @@ return {
 	 * @param  {Object} log
 	 * @return {String} 画像ログHTML
 	 */
-	_getImageHTML: function (log) {
+	_buildImageHTML: function (log) {
 		var imageName = decodeURIComponent(log.message);
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var imageUrl = baseUrl + imageName;
@@ -171,7 +181,7 @@ return {
 		var thumbExt = imageName.substr(imageName.lastIndexOf('.') + 1).toLowerCase();
 		var thumbUrl = baseUrl + 'thumb-' + imageName.substr(0, imageName.length-3) + thumbExt;
 
-		var image = '画像を送信しました。<a href="' + imageUrl + '" class="fancybox" title=""><img src="' + thumbUrl + '"></a>';
+		var image = Utils.sprintf('画像を送信しました。<a href="%s" class="fancybox" title=""><img src="%s"></a>', imageUrl, thumbUrl);
 		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), image);
 	},
 
@@ -181,7 +191,7 @@ return {
 	 * @param  {[type]} log [description]
 	 * @return {[type]}     [description]
 	 */
-	_getFileHTML: function (log) {
+	_buildFileHTML: function (log) {
 		var fileName = decodeURIComponent(log.message);
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
 		var fileUrl = baseUrl + fileName;
@@ -189,7 +199,7 @@ return {
 		var thumbExt = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
 		var thumbUrl = baseUrl + 'thumb-' + fileName.substr(0, fileName.lastIndexOf('.') + 1) + thumbExt;
 
-		var file = 'ファイルを送信しました。<div>【 <a href="' + fileUrl + '" title="" target="_blank">' + fileName + '</a> 】</div>';
+		var file = Utils.sprintf('ファイルを送信しました。<div>【 <a href="%s" title="" target="_blank">%s</a> 】</div>', fileUrl, fileName);
 		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), file);
 	},
 
