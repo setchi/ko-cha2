@@ -147,9 +147,9 @@ return {
 	 */
 	_getRemarkHTML: function (log) {
 		var message = decodeURIComponent(log.message);
-		message = Utils.escapeHTML(message).replace(this._regexURL, function () {
+		message = Utils.escapeHTML(message).replace(this._URLRegex, function () {
 			var url = "";
-			message.replace(this._regexURL, function ($1, $2) {
+			message.replace(this._URLRegex, function ($1, $2) {
 				url = $2;
 			});
 			return Utils.sprintf(this._linkText, url, url);
