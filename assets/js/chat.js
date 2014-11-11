@@ -194,12 +194,8 @@ return {
 	_buildFileHTML: function (log) {
 		var fileName = decodeURIComponent(log.message);
 		var baseUrl = 'assets/upload/' + roomInfo.room.id + '/';
-		var fileUrl = baseUrl + fileName;
 
-		var thumbExt = fileName.substr(fileName.lastIndexOf('.') + 1).toLowerCase();
-		var thumbUrl = baseUrl + 'thumb-' + fileName.substr(0, fileName.lastIndexOf('.') + 1) + thumbExt;
-
-		var file = Utils.sprintf('ファイルを送信しました。<div>【 <a href="%s" title="" target="_blank">%s</a> 】</div>', fileUrl, fileName);
+		var file = Utils.sprintf('ファイルを送信しました。<div>【 <a href="%s" title="" target="_blank">%s</a> 】</div>', baseUrl + fileName, fileName);
 		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), file);
 	},
 
