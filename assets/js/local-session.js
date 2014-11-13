@@ -70,10 +70,7 @@ LocalSession.prototype = {
 		localStorage.setItem('ko-cha2localsession', JSON.stringify(this.data));
 	}
 }
-var localSession = new LocalSession();
 
-return function () {
-	return localSession;
-}
+return new LocalSession();
 
-}());
+});

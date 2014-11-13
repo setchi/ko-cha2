@@ -168,6 +168,6 @@ Viewer.prototype = {
 	}
 }
 
-return Viewer;
+return new Viewer();
 
 });

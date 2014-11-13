@@ -39,10 +39,7 @@ UIEvent.prototype = {
 		});
 	}
 }
-UIEvent = new UIEvent();
 
-return function () {
-	return UIEvent;
-}
+return new UIEvent();
 
-}());
+});

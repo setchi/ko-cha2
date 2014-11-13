@@ -176,6 +176,6 @@ EditorManager.prototype = {
 	}
 }
 
-return EditorManager;
+return new EditorManager();
 
 });

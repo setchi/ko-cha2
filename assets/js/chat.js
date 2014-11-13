@@ -12,7 +12,7 @@ define([
  * チャットログに関する処理
  * @type {Object}
  */
-return {
+var Chat = {
 	/**
 	 * チャットログを保持する
 	 * @type {Array}
@@ -219,5 +219,7 @@ return {
 		return this._history;
 	}
 }
+
+return Chat;
 
 });

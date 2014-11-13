@@ -11,11 +11,9 @@ require([
 	'ui-filedrop',
 	'ui-main',
 	'ace'
-], function ($, roomInfo, localSession, connection, EditorManager, EditorPositionsEnum, Viewer, Chat, UIEvent) {
+], function ($, roomInfo, localSession, connection, editorManager, EditorPositionsEnum, viewer, Chat, UIEvent) {
 	"use strict";
 
-	var editorManager = new EditorManager();
-	var viewer = new Viewer();
 	connection.start();
 
 	// 相手から接続要求が来た時
