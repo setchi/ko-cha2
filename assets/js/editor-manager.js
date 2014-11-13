@@ -42,7 +42,7 @@ EditorManager.prototype = {
 	 * @param {String} viewerId
 	 */
 	remove: function (viewerId) {
-		if (!(viewerId) in this.editorList) return;
+		if (!(viewerId in this.editorList)) return;
 		
 		this.editorList[viewerId].remove();
 		delete this.editorList[viewerId];
@@ -54,7 +54,7 @@ EditorManager.prototype = {
 	 * @param  {String} viewerId
 	 */
 	changeViewingEditor: function (viewerId) {
-		if (void 0 === this.editorList[viewerId]) {
+		if (!(viewerId in this.editorList)) {
 			console.warn("ユーザー '" + viewerId + "' が存在しません");
 			return;
 		}
@@ -71,7 +71,7 @@ EditorManager.prototype = {
 	 * @return {Editor} 該当ViewerのEditorインスタンス
 	 */
 	get: function (viewerId) {
-		if (void 0 === this.editorList[viewerId]) {
+		if (!(viewerId in this.editorList)) {
 			this.add(viewerId);
 		}
 		return this.editorList[viewerId];
@@ -130,7 +130,7 @@ EditorManager.prototype = {
 	 * @param {EditorPositionsEnum} position    位置フラグ
 	 */
 	setPosition: function (viewerId, position) {
-		if (void 0 === this.editorList[viewerId]) {
+		if (!(viewerId in this.editorList)) {
 			this.add(viewerId);
 		}
 

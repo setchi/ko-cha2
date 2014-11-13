@@ -162,7 +162,7 @@ return {
 		// URLをリンク化
 		message = message.replace(this._URLRegex, function ($1, url) {
 			return Utils.sprintf('<a href="%s" target="_blank">%s</a>', url, url);
-		}.bind(this));
+		});
 		
 		return Utils.sprintf(this._logText, log.viewer_id, this.getIconUrl(log.image), message);
 	},
