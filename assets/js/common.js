@@ -4,7 +4,7 @@ require.config({
 	paths: {
 		'jquery': [
 			'//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min',
-			'lib/jquery.min.js'
+			'lib/jquery.min'
 		],
 		'jquery.fancybox': 'lib/jquery.fancybox.pack',
 		'jquery.contextmenu': 'lib/contextmenu.min',
