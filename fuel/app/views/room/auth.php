@@ -39,7 +39,6 @@
 <?php
 	echo Asset::js('lib/jquery.min.js');
 	echo Asset::js('lib/bootstrap.min.js');
-	echo Asset::js("sdk/sdk.js");
 ?>
 </body>
 </html>
