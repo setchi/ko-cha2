@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="keywords" content="setchi_">
+<meta name="keywords" content="setchi">
 <meta name="description" content="ちょっとコードを交えてチャットしたい時のWebアプリ">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:creator" content="@setchi_">
+<meta name="twitter:creator" content="@setchi">
 <!--<meta property="fb:app_id" content="">-->
 <meta property="og:title" content="Ko-cha">
 <meta property="og:description" content="ちょっとコードを交えてチャットしたい時のWebアプリ">

@@ -4,9 +4,9 @@
         "uid": 1013535504,
         "info": {
             "name": "setchi-",
-            "nickname": "setchi_",
+            "nickname": "setchi",
             "urls": {
-                "twitter": "http:\/\/twitter.com\/setchi_",
+                "twitter": "http:\/\/twitter.com\/setchi",
                 "website": null
             },
             "location": "",
@@ -21,7 +21,7 @@
             "id": 1013535504,
             "id_str": "1013535504",
             "name": "setchi-",
-            "screen_name": "setchi_",
+            "screen_name": "setchi",
             "location": "",
             "description": "",
             "url": null,
