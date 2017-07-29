@@ -126,6 +126,10 @@ class Controller_Room extends Controller_Rest
 		$user_data = Input::post('user_data');
 		$owner_id_list = array();
 
+		if ($user_data == null) {
+			return $this->response(array('ownership' => array()));
+		}
+
 		foreach ($user_data as $key => $value)
 			{
 				$owner_id_list[] = $value;
