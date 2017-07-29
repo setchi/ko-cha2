@@ -1,5 +1,23 @@
 <?php
+/**
+ * Fuel is a fast, lightweight, community driven PHP5 framework.
+ *
+ * @package    Fuel
+ * @version    1.7
+ * @author     Fuel Development Team
+ * @license    MIT License
+ * @copyright  2010 - 2013 Fuel Development Team
+ * @link       http://fuelphp.com
+ */
 
+/**
+ * The Room Controller.
+ *
+ * チャットルーム生成・ルームアクセスに関する処理
+ *
+ * @package  app
+ * @extends  Controller
+ */
 class Controller_Room extends Controller_Rest
 {
 	/**
