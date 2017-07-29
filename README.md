@@ -2,13 +2,13 @@
 
 コードを交えたチャットを手軽に始められるWebアプリです。[English](https://translate.google.com/translate?sl=ja&tl=en&u=https://github.com/setchi/ko-cha2) (by Google Translate)
 
+![ko-cha2](assets/img/ko-cha2_s.png "ko-cha2")
+
 [http://setchi.jp/ko-cha2/](http://setchi.jp/ko-cha2/)
 
 自身のコードを共有・編集しながらチャットが出来ます。
 共有したいファイルをドラッグ&ドロップするか、タブエリアをダブルクリックして空タブを開きます。
 通信は基本的にWebRTCで行っています。Ctrl+Sでサーバ上にコードを記憶することもできます。
-
-![ko-cha2](assets/img/ko-cha2_s.png "ko-cha2")
 
 ## できること
 - 部屋のパスワード設定
