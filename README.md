@@ -4,7 +4,7 @@
 
 ![ko-cha2](assets/img/ko-cha2_s.png "ko-cha2")
 
-[http://setchi.jp/ko-cha2/](http://setchi.jp/ko-cha2/)
+[https://setchi.jp/ko-cha2/](https://setchi.jp/ko-cha2/)
 
 自身のコードを共有・編集しながらチャットが出来ます。
 共有したいファイルをドラッグ&ドロップするか、タブエリアをダブルクリックして空タブを開きます。
