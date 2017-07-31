@@ -1,6 +1,6 @@
 # Ko-cha2
 
-コードを交えたチャットを手軽に始められるWebアプリです。[English](https://translate.google.com/translate?sl=ja&tl=en&u=https://github.com/setchi/ko-cha2) (by Google Translate)
+コーディングチャットを手軽に始められるWebアプリです。[English](https://translate.google.com/translate?sl=ja&tl=en&u=https://github.com/setchi/ko-cha2) (by Google Translate)
 
 ![ko-cha2](assets/img/ko-cha2_s.png "ko-cha2")
 
