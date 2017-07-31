@@ -35,9 +35,9 @@
 ## 動作環境
 下記の環境で動作を確認しています。
 
-* Apache 2.2.3
-* PHP 5.3.3
-* MySQL 5.0.95
+* Apache 2.4.6
+* PHP 5.6.30
+* MySQL 5.7
 
 ## ビルド
 * fuel/app/config/内のdb.phpとopauth.phpの設定が必要です。
