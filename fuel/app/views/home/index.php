@@ -27,7 +27,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="alert alert-info" role="alert">当サイトは Ko-cha のリニューアル版です。前作は<a href="http://setchi.jp/ko-cha/" class="alert-link">こちら</a>。変更点は<a href="http://setchi-q.hatenablog.com/entry/2014/07/26/235455" class="alert-link">こちら</a>から。</div>
+	<div class="alert alert-info" role="alert">当サイトは Ko-cha のリニューアル版です。前作は<a href="http://setchi.jp/ko-cha/" class="alert-link">こちら</a>。変更点は<a href="http://setchi.hatenablog.com/entry/2014/07/26/235455" class="alert-link">こちら</a>から。</div>
 
 	<!-- Modal -->
 	<div class="modal fade" id="startPairProgramming" tabindex="-1" role="dialog" aria-labelledby="startPairProgrammingLabel" aria-hidden="true">
