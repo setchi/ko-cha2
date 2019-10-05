@@ -272,7 +272,7 @@ return array(
 		 */
 		'packages'  => array(
 		 	'opauth',
-		 	'fuel-casset',
+		 	'fuel-casset'
 		// 	//'orm',
 		),
 

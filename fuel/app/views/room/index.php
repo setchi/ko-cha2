@@ -16,7 +16,7 @@
 <meta name="google-site-verification" content="9hMJEsV9tNWEmbRxVIrMHbxJ2P-fCILSKhag2YqHKiE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="http://setchi.jp/ko-cha2/assets/img/icon/kocha.png">
+<link rel="shortcut icon" href="<?php echo $base_url ?>assets/img/icon/kocha.png">
   <title>Ko-cha | チャットルーム</title>
 <?php
 	echo Asset::css('lib/bootstrap.min.css');
@@ -108,13 +108,13 @@
 			<div class="bar"></div>
 		</div>
 		<span class="editor-list-region"><div class="editor-list"> </div></span>
-		
+
 	</div>
 
 	<li class="viewer-icon" data-viewer-id=""></li>
 
 </div>
-<script src="https://skyway.io/dist/0.3/peer.min.js"></script>
+<script type="text/javascript" src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
 <?php
 	echo Asset::js('lib/require.min.js');
 	echo Asset::js('common.js');

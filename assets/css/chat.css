@@ -397,8 +397,7 @@ header .viewer-list .active {
 	border: 1px solid #0f0;
 	background-color: rgba(0, 255, 0, 0.05);
 	z-index: 9999;
-	transition: all 0.4s cubic-bezier(0, 1, 0.5, 1) 0;
-	-moz-transition: all 0.4s cubic-bezier(0, 1, 0.5, 1) 0;
+	transition: all 0.4s cubic-bezier(0, 1, 0.5, 1) 0s;
 }
 
 .ace_hidden-cursors .ace_cursor {

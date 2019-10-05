@@ -108,19 +108,14 @@ Connection.prototype = {
 	 */
 	_createPeerConnection: function () {
 		this.peer = new Peer({
-			key: 'e2cc565a-4d67-11e4-a512-5552163100a0',
+			key: '02bd7ce9-dc0e-41d2-93c8-1b3146445905',
 			config: {
 				iceServers: [{
-					url: 'stun:stun.l.google.com:19302'
-				}, {
-					url: 'turn:192.158.29.39:3478?transport=udp',
-					credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-					username: '28224511:1379330808'
-				}, {
-					url: 'turn:192.158.29.39:3478?transport=tcp',
-					credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-					username: '28224511:1379330808'
-				}]
+				  urls: 'stun:stun.webrtc.ecl.ntt.com:3478',
+				  url:  'stun:stun.webrtc.ecl.ntt.com:3478',
+				}],
+				iceTransportPolicy: 'all',
+				sdpSemantics: 'plan-b',
 			}
 		});
 
@@ -171,16 +166,23 @@ Connection.prototype = {
 		var num = 0;
 
 		return function (peerId) {
+			function peerConnect(that) {
+				var conn = that.peer.connect(peerId, {
+					reliable: true,
+					metadata: {
+						viewerId: localSession.get(roomInfo.room.id),
+						num: num++
+					}
+				});
+				that._setupDataConnection(conn);
+			}
 			console.log('onOffer', peerId);
-
-			var conn = this.peer.connect(peerId, {
-				reliable: true,
-				metadata: {
-					viewerId: localSession.get(roomInfo.room.id),
-					num: num++
-				}
-			});
-			this._setupDataConnection(conn);
+			
+			if (!this.peer.open) {
+				this.on('peerOpenProcess', () => peerConnect(this));
+			} else {
+				peerConnect(this);
+			}
 		}
 	}()),
 

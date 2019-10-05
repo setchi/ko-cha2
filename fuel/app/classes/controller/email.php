@@ -6,14 +6,14 @@ class Controller_Email extends Controller_Rest
 	{
 		Package::load('email');
 
-		$subject = 'Ko-cha コンタクト';
+		$subject = 'Ko-cha2 コンタクト';
 		$body = Input::post('body');
 
-		$email = Email::forge('jis');
-		$email->from('admin@mozimovie.wwww.jp', 'Ko-cha');
-		$email->to('ri_xer@yahoo.co.jp');
+		$email = Email::forge('utf8');
+		$email->from('admin@setchi.jp', 'Ko-cha');
+		$email->to('fox@setchi.jp');
 		$email->subject($subject);
-		$email->body(mb_convert_encoding($body, 'jis'));
+		$email->body(mb_convert_encoding($body, 'utf8'));
 
 		$err_msg = '送信が完了しました。';
 
