@@ -121,6 +121,7 @@ Connection.prototype = {
 
 		this.peer.on('open', function (myPeerId) {
 			console.log('My peer ID Is: ' + myPeerId);
+			this._fire('peerOpenProcess');
 			this.send({
 				type: 'update_peer_id',
 				data: { 'peer_id': myPeerId }
